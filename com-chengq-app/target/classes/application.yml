@@ -103,5 +103,7 @@ xxl:
       # executor 监听端口；建议使用固定端口给公网/跨机器环境；本地可用 0 自动选择空闲端口
       port: 0
       # executor 任务日志路径
-      logpath: ./logs/xxl-job/jobhandler
+      # 相对 com-chengq-app 模块目录：../ 会落到主项目根目录（com-chengq-boot/logs/...）
+      # 放到与业务日志同一个 logs 根目录下，避免与业务日志目录分离
+      logpath: ../logs/xxl-job
       logretentiondays: 30

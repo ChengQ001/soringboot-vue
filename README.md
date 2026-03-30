@@ -141,6 +141,9 @@ redissonLockTool.withLock(
 本项目内置示例 handler：
 `demoJobHandler`
 
+日志输出位置（executor 日志 + XXL-Job 任务日志）：
+`com-chengq-boot/logs/`（其中 XXL-Job 任务日志在 `logs/xxl-job/` 下，按日期/任务号生成文件）
+
 在 admin 里创建任务时，`ExecutorHandler` 填 `demoJobHandler`，然后点击“立即执行”。
 
 验证执行是否成功：查看 `com-chengq-app` 控制台日志是否打印 `XXL-Job demoJobHandler executed.`
