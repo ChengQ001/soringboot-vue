@@ -1,0 +1,1 @@
+import{a as t}from"./axios-CEpEGfqc.js";const o={create:e=>t.post("/menus",e),update:e=>t.post("/menus/update",e),remove:e=>t.post("/menus/delete",e),detail:e=>t.post("/menus/detail",e),list:(e={})=>t.post("/menus/list",e),tree:(e={})=>t.post("/menus/tree",e),root:(e={})=>t.post("/menus/root",e),children:e=>t.post("/menus/children",e)};export{o as m};

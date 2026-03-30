@@ -1,0 +1,107 @@
+# Server Configuration
+server:
+  port: 8081
+
+# Spring Configuration
+spring:
+  application:
+    name: com-chengq
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  # Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/com_chengq?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # Druid Connection Pool Configuration
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+  # Redis 配置（如需远程/密码环境可按需修改）
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    # Redis 数据库下标（默认是 0，对应 db0）
+    database: 0
+    timeout: 5000
+    # 默认超时单位为毫秒，使用 Lettuce
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+
+# MyBatis Plus Configuration
+mybatis-plus:
+  # Mapper XML文件位置
+  mapper-locations: classpath:mapper/**/*.xml
+  # 实体类包路径
+  type-aliases-package: com.chengq.api.entity
+  # 全局配置
+  global-config:
+    db-config:
+      # 主键类型
+      id-type: auto
+      # 表前缀
+      table-prefix: tb_
+      # 字段策略
+      field-strategy: not_empty
+      # 驼峰命名
+      column-underline: true
+      # 自动创建表
+      auto-fill: true
+  # 配置
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 打印SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 延迟加载
+    lazy-loading-enabled: true
+    # 按需加载
+    aggressive-lazy-loading: false
+
+# Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
+    config-url: /api-docs/swagger-config
+    url: /api-docs
+
+# XXL-Job executor configuration (XXL-Job Admin separately deployed recommended)
+xxl:
+  job:
+    admin:
+      # xxl-job-admin 地址；留空表示不向 admin 注册/拉取任务
+      addresses: "http://localhost:8080/xxl-job-admin"
+    accessToken: default_token
+    executor:
+      # executor 注册到 admin 时使用的应用名
+      appname: com-chengq-executor
+      # 使用 Spring 的属性注入；留空会自动取本机 IP
+      ip: 127.0.0.1
+      # executor 监听端口；建议使用固定端口给公网/跨机器环境；本地可用 0 自动选择空闲端口
+      port: 0
+      # executor 任务日志路径
+      logpath: ./logs/xxl-job/jobhandler
+      logretentiondays: 30
