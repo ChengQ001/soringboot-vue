@@ -1,0 +1,88 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+*.hprof
+*.pyc
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+tmp/
+.metadata
+.plugins
+*.tmp
+*.bak
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# 系统文件
+.DS_Store
+Thumbs.db
+$*
+.~*
+*.log
+
+# 日志
+logs/
+*.log
+
+# 应用配置
+application-local.yml
+application-local.properties
+bootstrap-local.yml
+*.local
+*.dev
+
+# 密钥 / 凭证
+*.key
+*.pem
+*.keystore
+jwt.pem
+secret.properties
+
+# 打包产物
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# 测试
+*.test
+*/test-output/
