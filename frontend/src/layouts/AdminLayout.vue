@@ -3,13 +3,22 @@
     <aside class="sidebar">
       <div class="brand">系统管理</div>
       <nav class="nav">
-        <div class="nav-group">业务</div>
-        <router-link class="nav-item" to="/admin/users">用户管理</router-link>
-        <router-link class="nav-item" to="/admin/roles">角色管理</router-link>
-        <router-link class="nav-item" to="/admin/menus">菜单管理</router-link>
-        <div class="nav-group">授权</div>
-        <router-link class="nav-item" to="/admin/bind-role-menu">角色-菜单绑定</router-link>
-        <router-link class="nav-item" to="/admin/bind-user-role">用户-角色绑定</router-link>
+        <template v-if="menuRoots && menuRoots.length">
+          <template v-for="root in menuRoots" :key="root.id">
+            <div class="nav-group">{{ root.name }}</div>
+            <router-link
+              v-for="child in (root.children || [])"
+              :key="child.id"
+              class="nav-item"
+              :to="child.path"
+            >
+              {{ child.name }}
+            </router-link>
+          </template>
+        </template>
+        <template v-else>
+          <div class="nav-group">暂无菜单</div>
+        </template>
       </nav>
       <div class="sidebar-footer">
         <router-link to="/home" class="link-home">返回首页</router-link>
@@ -97,10 +106,13 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { userApi } from '../api/user'
 import { authApi } from '../api/auth'
+import { menuApi } from '../api/menu'
 import { logout as doLogout } from '../utils/auth'
 import { flash } from '../utils/flash'
 
 const username = ref(localStorage.getItem('username') || '')
+
+const menuRoots = ref([])
 
 const userWidgetRef = ref(null)
 const userDropdownVisible = ref(false)
@@ -166,6 +178,19 @@ async function fetchUserDetail() {
     flash(e?.message || '获取用户信息失败', 'error')
   } finally {
     userDetailLoading.value = false
+  }
+}
+
+async function fetchMenuTree() {
+  try {
+    const res = await menuApi.tree({})
+    if (res.code === 200) {
+      menuRoots.value = res.data || []
+    } else {
+      flash(res.msg || '获取菜单失败', 'error')
+    }
+  } catch (e) {
+    flash(e?.message || '获取菜单失败', 'error')
   }
 }
 
@@ -241,6 +266,7 @@ function onGlobalClick(e) {
 
 onMounted(() => {
   document.addEventListener('click', onGlobalClick)
+  fetchMenuTree()
 })
 
 onBeforeUnmount(() => {

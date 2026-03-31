@@ -1,5 +1,6 @@
 package com.chengq.api.controller;
 
+import com.chengq.api.model.IdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,14 @@ public interface PermissionController {
     @PostMapping("/user-roles")
     @Operation(summary = "绑定用户角色", description = "绑定用户和角色")
     ApiResponse<Void> bindUserRoles(@RequestBody UserRoleBindRequest request);
+
+    @PostMapping("/role-menus/detail")
+    @Operation(summary = "查询角色菜单绑定", description = "返回 roleId 下当前绑定的 menuIds")
+    ApiResponse<java.util.List<Long>> getRoleMenuIds(@RequestBody IdRequest request);
+
+    @PostMapping("/user-roles/detail")
+    @Operation(summary = "查询用户角色绑定", description = "返回 userId 下当前绑定的 roleIds")
+    ApiResponse<java.util.List<Long>> getUserRoleIds(@RequestBody IdRequest request);
     
     /**
      * 角色菜单绑定请求

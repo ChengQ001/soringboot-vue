@@ -7,6 +7,8 @@ com\chengq\app\implcontroller\PermissionControllerImpl.class
 com\chengq\app\service\interfaces\UserRoleService.class
 com\chengq\app\config\RedisConfig.class
 com\chengq\app\implcontroller\MenuControllerImpl.class
+com\chengq\app\implcontroller\SysParkControllerImpl.class
+com\chengq\app\service\interfaces\SysParkService.class
 com\chengq\app\service\Impl\MenuServiceImpl.class
 com\chengq\app\service\interfaces\SysUserService.class
 com\chengq\app\implcontroller\SysUserControllerImpl.class
@@ -26,6 +28,7 @@ com\chengq\app\service\Impl\UserServiceImpl.class
 com\chengq\app\service\Impl\RoleMenuServiceImpl.class
 com\chengq\app\implcontroller\RoleControllerImpl.class
 com\chengq\app\annotation\RequiresPermission.class
+com\chengq\app\service\Impl\SysParkServiceImpl.class
 com\chengq\app\service\Impl\HelloServiceImpl.class
 com\chengq\app\service\interfaces\MenuService.class
 com\chengq\app\service\Impl\SysUserServiceImpl.class

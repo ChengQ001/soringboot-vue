@@ -4,6 +4,9 @@
     <p class="hint">角色名称唯一。</p>
     <div class="toolbar">
       <button type="button" class="btn primary" @click="openAdd">新增角色</button>
+      <button type="button" class="btn" :disabled="reloading" @click="refreshList">
+        {{ reloading ? '刷新中…' : '刷新列表' }}
+      </button>
     </div>
     <div class="table-wrap">
       <table class="tbl">
@@ -59,6 +62,7 @@ import { flash } from '../../utils/flash'
 const list = ref([])
 const dialog = ref(null)
 const saving = ref(false)
+const reloading = ref(false)
 const form = ref({ id: null, name: '', description: '' })
 
 async function load() {
@@ -68,6 +72,17 @@ async function load() {
     else flash(res.msg || '加载失败', 'error')
   } catch (e) {
     flash(e.message || '加载失败', 'error')
+  }
+}
+
+async function refreshList() {
+  if (reloading.value) return
+  reloading.value = true
+  try {
+    await load()
+    flash('列表已刷新', 'success')
+  } finally {
+    reloading.value = false
   }
 }
 
@@ -134,6 +149,10 @@ onMounted(load)
 }
 .toolbar {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 .btn {
   padding: 0.45rem 1rem;

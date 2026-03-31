@@ -1,1 +1,0 @@
-import{a as e}from"./axios-CEpEGfqc.js";const p={list:()=>e.post("/system/users/list",{}),add:s=>e.post("/system/users/add",s),update:s=>e.post("/system/users/update",s),delete:s=>e.post("/system/users/delete",s)};export{p as s};

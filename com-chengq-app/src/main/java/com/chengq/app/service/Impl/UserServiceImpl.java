@@ -68,14 +68,14 @@ public class UserServiceImpl implements UserService {
                 User admin = new User();
                 admin.setUsername("admin");
                 admin.setPhone("13800138000");
-                admin.setPassword("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy");
+                admin.setPassword("$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6");
                 admin.setDescription("系统管理员");
                 userMapper.insert(admin);
                 
                 User user = new User();
                 user.setUsername("user");
                 user.setPhone("13900139000");
-                user.setPassword("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy");
+                user.setPassword("$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6");
                 user.setDescription("普通用户");
                 userMapper.insert(user);
                 

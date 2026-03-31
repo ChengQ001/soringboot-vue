@@ -4,6 +4,11 @@
     <p class="hint">选择用户与园区，勾选角色后提交。</p>
 
     <div class="form-block">
+      <div class="toolbar-inline">
+        <button type="button" class="btn" :disabled="reloading" @click="refreshList">
+          {{ reloading ? '刷新中…' : '刷新列表' }}
+        </button>
+      </div>
       <div class="form-row">
         <label>用户</label>
         <select v-model="userId">
@@ -14,8 +19,13 @@
         </select>
       </div>
       <div class="form-row">
-        <label>parkId（可选）</label>
-        <input v-model.number="parkId" type="number" placeholder="可选" />
+        <label>园区（可空）</label>
+        <select v-model.number="parkId">
+          <option :value="null">全部园区（空）</option>
+          <option v-for="p in parks" :key="p.id" :value="p.id">
+            {{ p.name }} ({{ p.id }})
+          </option>
+        </select>
       </div>
     </div>
 
@@ -34,26 +44,63 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { sysUserApi } from '../../api/system'
+import { onMounted, ref, watch } from 'vue'
+import { parkApi, sysUserApi } from '../../api/system'
 import { roleApi } from '../../api/role'
 import { permissionApi } from '../../api/permission'
 import { flash } from '../../utils/flash'
 
 const users = ref([])
 const roles = ref([])
+const parks = ref([])
 const userId = ref('')
 const parkId = ref(null)
 const selectedRoleIds = ref([])
 const submitting = ref(false)
+const reloading = ref(false)
 
 async function load() {
   try {
-    const [ur, rr] = await Promise.all([sysUserApi.list(), roleApi.list({})])
+    const [ur, rr, pr] = await Promise.all([sysUserApi.list(), roleApi.list({}), parkApi.list()])
     if (ur.code === 200) users.value = ur.data || []
     if (rr.code === 200) roles.value = rr.data || []
+    if (pr.code === 200) parks.value = pr.data || []
   } catch (e) {
     flash(e.message || '加载失败', 'error')
+  }
+}
+
+async function refreshList() {
+  if (reloading.value) return
+  reloading.value = true
+  try {
+    await load()
+    flash('列表已刷新', 'success')
+  } finally {
+    reloading.value = false
+  }
+}
+
+watch(userId, (id) => {
+  if (!id) {
+    selectedRoleIds.value = []
+    return
+  }
+  loadBoundRoles(id)
+})
+
+async function loadBoundRoles(id) {
+  try {
+    const res = await permissionApi.getUserRoleIds({ id: Number(id) })
+    if (res.code === 200) {
+      selectedRoleIds.value = Array.isArray(res.data) ? res.data : []
+    } else {
+      selectedRoleIds.value = []
+      flash(res.msg || '加载已绑定角色失败', 'error')
+    }
+  } catch (e) {
+    selectedRoleIds.value = []
+    flash(e.message || '加载已绑定角色失败', 'error')
   }
 }
 
@@ -101,6 +148,9 @@ onMounted(load)
   max-width: 420px;
   margin-bottom: 1rem;
 }
+.toolbar-inline {
+  margin-bottom: 0.75rem;
+}
 .form-row {
   margin-bottom: 0.75rem;
 }
@@ -145,6 +195,13 @@ onMounted(load)
   border-radius: 6px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
+  cursor: pointer;
+}
+.btn {
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
   cursor: pointer;
 }
 .btn.primary:disabled {

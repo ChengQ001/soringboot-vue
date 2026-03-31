@@ -52,6 +52,11 @@ const router = createRouter({
           path: 'bind-user-role',
           name: 'BindUserRole',
           component: () => import('../views/admin/BindUserRole.vue')
+        },
+        {
+          path: 'parks',
+          name: 'ParkManage',
+          component: () => import('../views/admin/ParkManage.vue')
         }
       ]
     }

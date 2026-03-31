@@ -1,0 +1,1 @@
+import{a as o}from"./axios-CHq4XjDU.js";import"./index-CMbqY2m4.js";const e={login:t=>o.post("/auth/login",t),register:t=>o.post("/auth/register",t),updateUser:t=>o.post("/auth/update",t),logout:()=>o.post("/auth/logout",{})};export{e as authApi};

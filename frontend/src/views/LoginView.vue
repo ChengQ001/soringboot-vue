@@ -15,17 +15,37 @@
         </div>
         <div class="form-group">
           <label for="password">密码</label>
-          <input
-            type="password"
-            id="password"
-            v-model="form.password"
-            placeholder="请输入密码"
-            required
-          />
+          <div class="password-row">
+            <input
+              :type="passwordVisible ? 'text' : 'password'"
+              id="password"
+              v-model="form.password"
+              placeholder="请输入密码"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              @click="passwordVisible = !passwordVisible"
+            >
+              {{ passwordVisible ? '隐藏' : '显示' }}
+            </button>
+          </div>
         </div>
         <button type="submit" :disabled="loading" class="login-btn">
           {{ loading ? '登录中...' : '登录' }}
         </button>
+        <div class="default-accounts">
+          <div class="default-title">内置账号（手机号登录）</div>
+          <div class="default-row">
+            <button type="button" class="pill" @click="fillDefault('admin')">
+              管理员：admin / 13800138000 / 123456
+            </button>
+            <button type="button" class="pill" @click="fillDefault('user')">
+              用户:user / 13900139000 / 123456
+            </button>
+          </div>
+        </div>
         <p class="footer-link">
           没有账号？
           <router-link to="/register">去注册</router-link>
@@ -49,6 +69,18 @@ const form = ref({
 })
 
 const loading = ref(false)
+const passwordVisible = ref(false)
+
+function fillDefault(kind) {
+  if (kind === 'admin') {
+    form.value.phone = '13800138000'
+    form.value.password = '123456'
+  } else if (kind === 'user') {
+    form.value.phone = '13900139000'
+    form.value.password = '123456'
+  }
+  passwordVisible.value = false
+}
 
 const handleLogin = async () => {
   const phone = (form.value.phone || '').trim()
@@ -134,6 +166,32 @@ const handleLogin = async () => {
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
 }
 
+.password-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.password-row input {
+  flex: 1;
+}
+
+.toggle-password {
+  flex-shrink: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  background: rgba(102, 126, 234, 0.08);
+  color: #1a56a8;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.toggle-password:hover {
+  background: rgba(102, 126, 234, 0.14);
+}
+
 .login-btn {
   width: 100%;
   padding: 0.75rem;
@@ -171,5 +229,40 @@ const handleLogin = async () => {
 
 .footer-link a:hover {
   text-decoration: underline;
+}
+
+.default-accounts {
+  margin-top: 1rem;
+  background: rgba(102, 126, 234, 0.06);
+  border: 1px solid rgba(102, 126, 234, 0.18);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.default-title {
+  font-size: 0.85rem;
+  color: #5b5f8f;
+  margin-bottom: 0.5rem;
+}
+
+.default-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+  color: #3d4a8f;
+  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  background: rgba(102, 126, 234, 0.12);
 }
 </style>

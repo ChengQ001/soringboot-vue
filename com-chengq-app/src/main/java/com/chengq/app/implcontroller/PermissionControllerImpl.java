@@ -1,6 +1,7 @@
 package com.chengq.app.implcontroller;
 
 import com.chengq.api.controller.PermissionController;
+import com.chengq.api.model.IdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import com.chengq.app.service.interfaces.RoleMenuService;
 import com.chengq.app.service.interfaces.UserRoleService;
@@ -28,5 +29,15 @@ public class PermissionControllerImpl implements PermissionController {
     public ApiResponse<Void> bindUserRoles(UserRoleBindRequest request) {
         userRoleService.bindUserRoles(request.getUserId(), request.getRoleIds(), request.getParkId());
         return ApiResponse.success(null);
+    }
+
+    @Override
+    public ApiResponse<java.util.List<Long>> getRoleMenuIds(IdRequest request) {
+        return ApiResponse.success(roleMenuService.getMenuIdsByRoleId(request.getId()));
+    }
+
+    @Override
+    public ApiResponse<java.util.List<Long>> getUserRoleIds(IdRequest request) {
+        return ApiResponse.success(userRoleService.getRoleIdsByUserId(request.getId()));
     }
 }

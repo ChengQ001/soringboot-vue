@@ -14,12 +14,12 @@ import java.util.List;
 @Mapper
 public interface MenuMapper extends BaseMapper<Menu> {
     
-    @Select("SELECT * FROM tb_menu WHERE deleted = 0 ORDER BY id ASC")
+    @Select("SELECT * FROM tb_menu WHERE deleted = 0 ORDER BY sort_order ASC, id ASC")
     List<Menu> selectAllMenus();
 
-    @Select("SELECT * FROM tb_menu WHERE deleted = 0 AND (parent_id IS NULL OR parent_id = 0) ORDER BY id ASC")
+    @Select("SELECT * FROM tb_menu WHERE deleted = 0 AND (parent_id IS NULL OR parent_id = 0) ORDER BY sort_order ASC, id ASC")
     List<Menu> selectRootMenus();
 
-    @Select("SELECT * FROM tb_menu WHERE deleted = 0 AND parent_id = #{parentId} ORDER BY id ASC")
+    @Select("SELECT * FROM tb_menu WHERE deleted = 0 AND parent_id = #{parentId} ORDER BY sort_order ASC, id ASC")
     List<Menu> selectChildrenByParentId(Long parentId);
 }

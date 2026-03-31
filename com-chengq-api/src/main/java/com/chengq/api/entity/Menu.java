@@ -1,5 +1,6 @@
 package com.chengq.api.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -32,7 +33,14 @@ public class Menu extends BaseEntity {
     /**
      * 父节点ID
      */
+    @TableField(value = "parent_id", updateStrategy = FieldStrategy.IGNORED)
     private Long parentId;
+
+    /**
+     * 排序（越小越靠前）
+     */
+    @TableField("sort_order")
+    private Integer sortOrder;
     
     /**
      * 菜单描述

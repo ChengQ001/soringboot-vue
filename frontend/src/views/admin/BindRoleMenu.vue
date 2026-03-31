@@ -4,6 +4,11 @@
     <p class="hint">选择角色与园区，勾选菜单后提交（会先清空该角色下原有关联再写入）。</p>
 
     <div class="form-block">
+      <div class="toolbar-inline">
+        <button type="button" class="btn" :disabled="reloading" @click="refreshList">
+          {{ reloading ? '刷新中…' : '刷新列表' }}
+        </button>
+      </div>
       <div class="form-row">
         <label>角色</label>
         <select v-model="roleId">
@@ -12,8 +17,13 @@
         </select>
       </div>
       <div class="form-row">
-        <label>parkId（园区，可空）</label>
-        <input v-model.number="parkId" type="number" placeholder="可选" />
+        <label>园区（可空）</label>
+        <select v-model.number="parkId">
+          <option :value="null">全部园区（空）</option>
+          <option v-for="p in parks" :key="p.id" :value="p.id">
+            {{ p.name }} ({{ p.id }})
+          </option>
+        </select>
       </div>
     </div>
 
@@ -38,22 +48,37 @@ import { onMounted, ref, watch } from 'vue'
 import { roleApi } from '../../api/role'
 import { menuApi } from '../../api/menu'
 import { permissionApi } from '../../api/permission'
+import { parkApi } from '../../api/system'
 import { flash } from '../../utils/flash'
 
 const roles = ref([])
 const menus = ref([])
+const parks = ref([])
 const roleId = ref('')
 const parkId = ref(null)
 const selectedMenuIds = ref([])
 const submitting = ref(false)
+const reloading = ref(false)
 
 async function loadRolesMenus() {
   try {
-    const [rr, mr] = await Promise.all([roleApi.list({}), menuApi.list({})])
+    const [rr, mr, pr] = await Promise.all([roleApi.list({}), menuApi.list({}), parkApi.list()])
     if (rr.code === 200) roles.value = rr.data || []
     if (mr.code === 200) menus.value = mr.data || []
+    if (pr.code === 200) parks.value = pr.data || []
   } catch (e) {
     flash(e.message || '加载失败', 'error')
+  }
+}
+
+async function refreshList() {
+  if (reloading.value) return
+  reloading.value = true
+  try {
+    await loadRolesMenus()
+    flash('列表已刷新', 'success')
+  } finally {
+    reloading.value = false
   }
 }
 
@@ -62,8 +87,23 @@ watch(roleId, (id) => {
     selectedMenuIds.value = []
     return
   }
-  selectedMenuIds.value = []
+  loadBoundMenus(id)
 })
+
+async function loadBoundMenus(id) {
+  try {
+    const res = await permissionApi.getRoleMenuIds({ id: Number(id) })
+    if (res.code === 200) {
+      selectedMenuIds.value = Array.isArray(res.data) ? res.data : []
+    } else {
+      selectedMenuIds.value = []
+      flash(res.msg || '加载已绑定菜单失败', 'error')
+    }
+  } catch (e) {
+    selectedMenuIds.value = []
+    flash(e.message || '加载已绑定菜单失败', 'error')
+  }
+}
 
 async function submit() {
   if (!roleId.value) {
@@ -108,6 +148,9 @@ onMounted(loadRolesMenus)
 .form-block {
   max-width: 420px;
   margin-bottom: 1rem;
+}
+.toolbar-inline {
+  margin-bottom: 0.75rem;
 }
 .form-row {
   margin-bottom: 0.75rem;
@@ -154,6 +197,13 @@ onMounted(loadRolesMenus)
   border-radius: 6px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
+  cursor: pointer;
+}
+.btn {
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
   cursor: pointer;
 }
 .btn.primary:disabled {

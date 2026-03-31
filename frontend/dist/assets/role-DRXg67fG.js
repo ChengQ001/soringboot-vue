@@ -1,1 +1,0 @@
-import{a as t}from"./axios-CEpEGfqc.js";const s={create:e=>t.post("/roles",e),update:e=>t.post("/roles/update",e),remove:e=>t.post("/roles/delete",e),detail:e=>t.post("/roles/detail",e),list:(e={})=>t.post("/roles/list",e)};export{s as r};
