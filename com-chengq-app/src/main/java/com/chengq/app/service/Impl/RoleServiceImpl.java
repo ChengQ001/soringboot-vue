@@ -2,21 +2,21 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Role;
-import com.chengq.api.mapper.RoleMapper;
-import com.chengq.app.service.interfaces.RoleService;
+import com.chengq.app.mapper.RoleMapper;
+import com.chengq.app.service.interfaces.IRoleService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 角色业务层实现类
  */
 @Slf4j
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl implements IRoleService {
 
     private final RoleMapper roleMapper;
+    private static final String ADMIN_ROLE = "ADMIN";
 
     public RoleServiceImpl(RoleMapper roleMapper) {
         this.roleMapper = roleMapper;
@@ -48,6 +48,9 @@ public class RoleServiceImpl implements RoleService {
         if (existingRole == null) {
             throw new RuntimeException("角色不存在: " + role.getId());
         }
+        if (ADMIN_ROLE.equals(existingRole.getName())) {
+            throw new RuntimeException("ADMIN 角色为系统保留角色，禁止修改");
+        }
         if (role.getName() != null) {
             Role roleByName = findByName(role.getName());
             if (roleByName != null && !roleByName.getId().equals(role.getId())) {
@@ -65,6 +68,9 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleMapper.selectById(id);
         if (role == null) {
             throw new RuntimeException("角色不存在: " + id);
+        }
+        if (ADMIN_ROLE.equals(role.getName())) {
+            throw new RuntimeException("ADMIN 角色为系统保留角色，禁止删除");
         }
         roleMapper.deleteById(id);
         log.info("Role deleted successfully: {}", id);

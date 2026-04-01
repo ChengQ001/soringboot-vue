@@ -8,13 +8,12 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.chengq.api.entity.BaseEntity;
 import com.chengq.api.entity.User;
 import com.chengq.app.util.UserContext;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
-
-import java.util.Date;
 
 /**
  * MyBatis Plus配置类

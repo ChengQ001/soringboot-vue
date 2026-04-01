@@ -1,12 +1,13 @@
 -- =========================================================
 -- com-chengq 项目数据库初始化脚本（全量）
 -- 1) 建库 + 建表
--- 2) 插入初始角色/用户/菜单
--- 3) 插入默认用户-角色、角色-菜单绑定
+-- 2) 插入初始角色/用户/园区/菜单
+-- 3) 插入默认用户-角色（仅 admin → ADMIN）
 --
--- 默认登录用户（密码：123456）
--- - admin / 13800138000
--- - user  / 13900139000
+-- 首次仅有 ADMIN 角色与 admin 账号；无 tb_role_menu 预置（ADMIN 登录后走全量菜单，由服务端处理）。
+-- 其它角色与角色-菜单绑定请在系统中配置。
+--
+-- 默认登录（密码：123456）：admin / 17688888888
 -- =========================================================
 
 -- 创建数据库
@@ -146,8 +147,7 @@ CREATE TABLE IF NOT EXISTS tb_user_role (
 INSERT IGNORE INTO tb_role
   (name, description, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name)
 VALUES
-  ('ADMIN', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system'),
-  ('USER', '普通用户', NOW(), 1, 'system', NOW(), 1, 'system');
+  ('ADMIN', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system');
 
 -- ---------------------------------------------------------
 -- 初始化：用户（密码：123456，BCrypt 加密后）
@@ -155,10 +155,8 @@ VALUES
 INSERT IGNORE INTO tb_user
   (username, phone, password, description, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name)
 VALUES
-  ('admin', '13800138000', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6',
-   '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system'),
-  ('user',  '13900139000', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6',
-   '普通用户', NOW(), 1, 'system', NOW(), 1, 'system');
+  ('admin', '17688888888', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6',
+   '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system');
 
 -- ---------------------------------------------------------
 -- 初始化：园区
@@ -204,84 +202,6 @@ VALUES
   (
     (SELECT id FROM tb_user WHERE username='admin' AND deleted=0 LIMIT 1),
     (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_user WHERE username='user' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  );
-
--- ---------------------------------------------------------
--- 初始化：角色-菜单绑定（演示用；当前菜单列表接口不做过滤）
--- ---------------------------------------------------------
--- ADMIN：所有菜单
-INSERT IGNORE INTO tb_role_menu
-  (role_id, menu_id, park_id, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name)
-VALUES
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='system' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='user' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='role' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='menu' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='auth' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='bind-role-menu' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='bind-user-role' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='park-manage' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  );
-
--- USER：仅系统菜单
-INSERT IGNORE INTO tb_role_menu
-  (role_id, menu_id, park_id, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name)
-VALUES
-  (
-    (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='system' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  -- 两层关系：在映射根 system 的同时，把它下面的子菜单也写入
-  (
-    (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='user' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='role' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
-  ),
-  (
-    (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),
-    (SELECT id FROM tb_menu WHERE code='menu' AND deleted=0 LIMIT 1),
-    NULL, NOW(), 1, 'system', NOW(), 1, 'system'
+    1,
+    NOW(), 1, 'system', NOW(), 1, 'system'
   );

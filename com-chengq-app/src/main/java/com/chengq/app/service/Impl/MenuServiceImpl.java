@@ -1,24 +1,25 @@
 package com.chengq.app.service.Impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Menu;
 import com.chengq.api.entity.Role;
 import com.chengq.api.entity.RoleMenu;
-import com.chengq.api.mapper.MenuMapper;
-import com.chengq.api.mapper.RoleMenuMapper;
-import com.chengq.api.mapper.RoleMapper;
-import com.chengq.app.service.interfaces.MenuService;
+import com.chengq.api.entity.UserRole;
+import com.chengq.app.mapper.MenuMapper;
+import com.chengq.app.mapper.RoleMapper;
+import com.chengq.app.mapper.RoleMenuMapper;
+import com.chengq.app.mapper.UserRoleMapper;
+import com.chengq.app.service.interfaces.IMenuService;
+import com.chengq.app.util.ParkContext;
 import com.chengq.app.util.UserContext;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 菜单业务层实现类
@@ -26,16 +27,19 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
  */
 @Slf4j
 @Service
-public class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl implements IMenuService {
 
     private final MenuMapper menuMapper;
     private final RoleMapper roleMapper;
     private final RoleMenuMapper roleMenuMapper;
+    private final UserRoleMapper userRoleMapper;
 
-    public MenuServiceImpl(MenuMapper menuMapper, RoleMapper roleMapper, RoleMenuMapper roleMenuMapper) {
+    public MenuServiceImpl(MenuMapper menuMapper, RoleMapper roleMapper, RoleMenuMapper roleMenuMapper,
+                           UserRoleMapper userRoleMapper) {
         this.menuMapper = menuMapper;
         this.roleMapper = roleMapper;
         this.roleMenuMapper = roleMenuMapper;
+        this.userRoleMapper = userRoleMapper;
     }
 
     @Override
@@ -183,45 +187,88 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> getMenuTree() {
-        // 1) ADMIN：直接返回全量菜单树
+        Long userId = UserContext.getCurrentUserId();
+        if (userId == null) {
+            return new ArrayList<>();
+        }
+        // ADMIN：不依赖 tb_role_menu，直接全量菜单（与园区无关，避免未带 X-Park-Id 时侧栏为空）
         if (UserContext.hasRole("ADMIN")) {
             List<Menu> allMenus = menuMapper.selectAllMenus();
             return buildMenuTree(allMenus);
         }
 
-        // 2) 非 ADMIN：根据当前用户角色 -> tb_role_menu -> 允许的菜单集合（含祖先+后代级联）
-        List<String> currentRoleNames = UserContext.getCurrentUserRoles();
-        if (currentRoleNames == null || currentRoleNames.isEmpty()) {
+        Long parkId = ParkContext.getParkId();
+        if (parkId == null) {
             return new ArrayList<>();
         }
 
-        List<Role> roles = roleMapper.selectList(
-                new LambdaQueryWrapper<Role>()
-                        .in(Role::getName, currentRoleNames)
+        // 非 ADMIN：按当前园区（X-Park-Id）+ 用户角色 + tb_role_menu（本园区优先于全局）建树
+        // 用户角色：当前园区显式绑定 + park_id 为 NULL 的全局绑定（分两路查询，避免 AND/OR 组合歧义）
+        List<UserRole> userRolesForPark = userRoleMapper.selectList(
+                new LambdaQueryWrapper<UserRole>()
+                        .eq(UserRole::getUserId, userId)
+                        .eq(UserRole::getParkId, parkId)
         );
-
-        if (roles == null || roles.isEmpty()) {
+        List<UserRole> userRolesGlobal = userRoleMapper.selectList(
+                new LambdaQueryWrapper<UserRole>()
+                        .eq(UserRole::getUserId, userId)
+                        .isNull(UserRole::getParkId)
+        );
+        List<UserRole> userRoles = new ArrayList<>();
+        if (userRolesForPark != null) {
+            userRoles.addAll(userRolesForPark);
+        }
+        if (userRolesGlobal != null) {
+            userRoles.addAll(userRolesGlobal);
+        }
+        if (userRoles.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<Long> roleIds = roles.stream()
-                .map(Role::getId)
+        List<Long> roleIds = userRoles.stream()
+                .map(UserRole::getRoleId)
                 .filter(id -> id != null)
+                .distinct()
                 .toList();
         if (roleIds.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<RoleMenu> roleMenus = roleMenuMapper.selectList(
+        // 角色菜单：当前园区 + 全局 NULL，分两路再合并
+        List<RoleMenu> roleMenusForPark = roleMenuMapper.selectList(
                 new LambdaQueryWrapper<RoleMenu>()
                         .in(RoleMenu::getRoleId, roleIds)
+                        .eq(RoleMenu::getParkId, parkId)
+        );
+        List<RoleMenu> roleMenusGlobal = roleMenuMapper.selectList(
+                new LambdaQueryWrapper<RoleMenu>()
+                        .in(RoleMenu::getRoleId, roleIds)
+                        .isNull(RoleMenu::getParkId)
         );
 
+        // 按角色合并：该角色在本园区「有任意一行」绑定则只采用本园区行，不再叠加 park_id 为 NULL 的全局行，
+        // 避免在园区里只勾了父节点却因全局历史数据仍带上全部子菜单。
         Set<Long> mappedMenuIds = new HashSet<>();
-        if (roleMenus != null) {
-            for (RoleMenu rm : roleMenus) {
-                if (rm != null && rm.getMenuId() != null) {
-                    mappedMenuIds.add(rm.getMenuId());
+        for (Long rid : roleIds) {
+            List<RoleMenu> parkRows = new ArrayList<>();
+            if (roleMenusForPark != null) {
+                for (RoleMenu rm : roleMenusForPark) {
+                    if (rm != null && rid.equals(rm.getRoleId())) {
+                        parkRows.add(rm);
+                    }
+                }
+            }
+            if (!parkRows.isEmpty()) {
+                for (RoleMenu rm : parkRows) {
+                    if (rm.getMenuId() != null) {
+                        mappedMenuIds.add(rm.getMenuId());
+                    }
+                }
+            } else if (roleMenusGlobal != null) {
+                for (RoleMenu rm : roleMenusGlobal) {
+                    if (rm != null && rid.equals(rm.getRoleId()) && rm.getMenuId() != null) {
+                        mappedMenuIds.add(rm.getMenuId());
+                    }
                 }
             }
         }
@@ -230,25 +277,19 @@ public class MenuServiceImpl implements MenuService {
             return new ArrayList<>();
         }
 
-        // 3) 构建菜单索引：parentId -> children
+        // 3) 构建 id -> 菜单（用于向上解析祖先）
         List<Menu> allMenus = menuMapper.selectAllMenus();
         Map<Long, Menu> byId = new HashMap<>();
-        Map<Long, List<Menu>> childrenByParentId = new HashMap<>();
         for (Menu m : allMenus) {
             if (m == null || m.getId() == null) continue;
             byId.put(m.getId(), m);
-
-            Long pid = m.getParentId();
-            if (pid != null && pid != 0) {
-                childrenByParentId.computeIfAbsent(pid, k -> new ArrayList<>()).add(m);
-            }
         }
 
-        // 4) 允许集合：映射菜单 + 祖先 + 后代（允许 root 则允许其所有子菜单）
+        // 4) 允许集合：仅显式绑定的菜单 + 其祖先（用于侧栏层级）；不自动包含未绑定的子节点
         Set<Long> allowedMenuIds = new HashSet<>();
         for (Long mappedId : mappedMenuIds) {
+            allowedMenuIds.add(mappedId);
             addAncestors(mappedId, byId, allowedMenuIds);
-            addDescendants(mappedId, childrenByParentId, allowedMenuIds);
         }
 
         // 5) 过滤并构建树
@@ -276,27 +317,6 @@ public class MenuServiceImpl implements MenuService {
             }
             allowedMenuIds.add(pid);
             curId = pid;
-        }
-    }
-
-    /**
-     * 将指定菜单的所有后代加入 allowedMenuIds（允许 root 则允许所有子菜单）
-     */
-    private void addDescendants(Long menuId, Map<Long, List<Menu>> childrenByParentId, Set<Long> allowedMenuIds) {
-        if (menuId == null) return;
-        List<Long> stack = new ArrayList<>();
-        stack.add(menuId);
-        while (!stack.isEmpty()) {
-            Long cur = stack.remove(stack.size() - 1);
-            if (cur == null) continue;
-            allowedMenuIds.add(cur);
-            List<Menu> children = childrenByParentId.get(cur);
-            if (children == null || children.isEmpty()) continue;
-            for (Menu child : children) {
-                if (child != null && child.getId() != null) {
-                    stack.add(child.getId());
-                }
-            }
         }
     }
 

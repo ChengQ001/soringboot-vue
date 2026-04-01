@@ -16,6 +16,10 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    const parkId = localStorage.getItem('parkId')
+    if (parkId) {
+      config.headers['X-Park-Id'] = parkId
+    }
     return config
   },
   error => {

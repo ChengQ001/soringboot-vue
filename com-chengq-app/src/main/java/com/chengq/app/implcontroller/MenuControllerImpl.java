@@ -6,19 +6,18 @@ import com.chengq.api.model.EmptyRequest;
 import com.chengq.api.model.IdRequest;
 import com.chengq.api.model.ParentIdRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.MenuService;
+import com.chengq.app.service.interfaces.IMenuService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
 public class MenuControllerImpl implements MenuController {
 
     @Autowired
-    private MenuService menuService;
+    private IMenuService menuService;
 
     @Override
     public ApiResponse<Menu> createMenu(Menu menu) {
@@ -31,9 +30,9 @@ public class MenuControllerImpl implements MenuController {
     }
 
     @Override
-    public ApiResponse<Void> deleteMenu(IdRequest request) {
+    public ApiResponse<Boolean> deleteMenu(IdRequest request) {
         menuService.deleteMenu(request.getId());
-        return ApiResponse.success(null);
+        return ApiResponse.success(true);
     }
 
     @Override

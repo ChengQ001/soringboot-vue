@@ -8,11 +8,10 @@ import com.chengq.api.model.SysUserVO;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 /**
  * 系统用户管理（CRUD，全部 POST）
@@ -35,5 +34,5 @@ public interface SysUserController {
 
     @PostMapping("/delete")
     @Operation(summary = "删除用户")
-    ApiResponse<Void> delete(@RequestBody IdRequest request);
+    ApiResponse<Boolean> delete(@RequestBody IdRequest request);
 }

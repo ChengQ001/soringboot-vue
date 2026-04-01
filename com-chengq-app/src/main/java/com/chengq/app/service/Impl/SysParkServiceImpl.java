@@ -2,21 +2,20 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Park;
-import com.chengq.api.mapper.ParkMapper;
+import com.chengq.app.mapper.ParkMapper;
 import com.chengq.api.model.SysParkAddRequest;
 import com.chengq.api.model.SysParkUpdateRequest;
 import com.chengq.api.model.SysParkVO;
-import com.chengq.app.service.interfaces.SysParkService;
+import com.chengq.app.service.interfaces.ISysParkService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
-public class SysParkServiceImpl implements SysParkService {
+public class SysParkServiceImpl implements ISysParkService {
 
     private final ParkMapper parkMapper;
 

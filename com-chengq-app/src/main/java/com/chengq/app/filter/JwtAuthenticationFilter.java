@@ -1,7 +1,8 @@
 package com.chengq.app.filter;
 
-import com.chengq.app.service.interfaces.UserService;
+import com.chengq.app.service.interfaces.IUserService;
 import com.chengq.app.util.JwtUtil;
+import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +15,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
 /**
  * JWT认证过滤器
  * 负责从请求头中提取JWT token，验证token有效性，并将用户信息设置到SecurityContext中
@@ -27,12 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // JWT工具类，用于token生成和验证
     private final JwtUtil jwtUtil;
     // 用户服务，用于加载用户信息
-    private final UserService userService;
+    private final IUserService userService;
     
     /**
      * 构造函数注入依赖
      */
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, IUserService userService) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
     }

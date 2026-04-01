@@ -7,17 +7,16 @@ import com.chengq.api.model.SysUserAddRequest;
 import com.chengq.api.model.SysUserUpdateRequest;
 import com.chengq.api.model.SysUserVO;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.SysUserService;
+import com.chengq.app.service.interfaces.ISysUserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class SysUserControllerImpl implements SysUserController {
 
-    private final SysUserService sysUserService;
+    private final ISysUserService sysUserService;
 
     @Override
     public ApiResponse<List<SysUserVO>> list(EmptyRequest body) {
@@ -35,8 +34,8 @@ public class SysUserControllerImpl implements SysUserController {
     }
 
     @Override
-    public ApiResponse<Void> delete(IdRequest request) {
+    public ApiResponse<Boolean> delete(IdRequest request) {
         sysUserService.deleteUser(request.getId());
-        return ApiResponse.success(null);
+        return ApiResponse.success(true);
     }
 }

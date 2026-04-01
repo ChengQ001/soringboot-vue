@@ -2,27 +2,31 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.User;
-import com.chengq.api.mapper.UserMapper;
+import com.chengq.app.mapper.UserMapper;
 import com.chengq.api.model.SysUserAddRequest;
 import com.chengq.api.model.SysUserUpdateRequest;
 import com.chengq.api.model.SysUserVO;
-import com.chengq.app.service.interfaces.SysUserService;
+import com.chengq.app.service.interfaces.ISysUserService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SysUserServiceImpl implements SysUserService {
+public class SysUserServiceImpl implements ISysUserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private static final String ADMIN_USERNAME = "admin";
+
+    private static boolean isProtectedAdmin(User user) {
+        return user != null && ADMIN_USERNAME.equalsIgnoreCase(user.getUsername());
+    }
 
     @Override
     public List<SysUserVO> listUsers() {
@@ -100,6 +104,9 @@ public class SysUserServiceImpl implements SysUserService {
         User user = userMapper.selectById(id);
         if (user == null) {
             throw new RuntimeException("用户不存在");
+        }
+        if (isProtectedAdmin(user)) {
+            throw new RuntimeException("admin 账号为系统保留账号，禁止删除");
         }
         userMapper.deleteById(id);
     }

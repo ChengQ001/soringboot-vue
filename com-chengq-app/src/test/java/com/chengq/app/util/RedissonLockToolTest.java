@@ -1,16 +1,14 @@
 package com.chengq.app.util;
 
+import com.chengq.app.Application;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.chengq.app.Application;
 
 @SpringBootTest(classes = Application.class)
 public class RedissonLockToolTest {

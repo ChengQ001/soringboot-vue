@@ -9,16 +9,19 @@ import lombok.Data;
  */
 @Data
 public class RegisterRequest {
+    /** 用户名，唯一性由服务端校验 */
     @NotBlank(message = "用户名不能为空")
     private String username;
 
+    /** 11 位大陆手机号 */
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "请输入有效的11位手机号")
     private String phone;
 
+    /** 明文密码，后端 BCrypt 后写入 tb_user.password */
     @NotBlank(message = "密码不能为空")
     private String password;
 
-    /** 选填 */
+    /** 个人描述，选填 */
     private String description;
 }

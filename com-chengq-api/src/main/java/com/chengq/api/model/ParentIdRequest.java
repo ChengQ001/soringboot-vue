@@ -7,5 +7,6 @@ import lombok.Data;
  */
 @Data
 public class ParentIdRequest {
+    /** 父节点主键（如菜单 parent_id）；根节点可为 0 或 null，依接口约定 */
     private Long parentId;
 }

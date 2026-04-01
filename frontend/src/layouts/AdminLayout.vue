@@ -26,6 +26,12 @@
     </aside>
     <main class="main">
       <div class="main-topbar">
+        <div v-if="parkOptions.length" class="park-switch">
+          <label for="park-select">园区</label>
+          <select id="park-select" v-model="selectedParkId" class="park-select" @change="onParkChange">
+            <option v-for="p in parkOptions" :key="p.id" :value="String(p.id)">{{ p.name }}</option>
+          </select>
+        </div>
         <div class="user-widget" ref="userWidgetRef">
           <!-- 用户下拉菜单：个人信息/修改密码/退出登录 -->
           <div class="user-trigger" @click="toggleUserDropdown">
@@ -104,15 +110,45 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { userApi } from '../api/user'
 import { authApi } from '../api/auth'
 import { menuApi } from '../api/menu'
 import { logout as doLogout } from '../utils/auth'
 import { flash } from '../utils/flash'
 
+const router = useRouter()
+const route = useRoute()
+
 const username = ref(localStorage.getItem('username') || '')
 
 const menuRoots = ref([])
+
+const parkOptions = ref([])
+const selectedParkId = ref(localStorage.getItem('parkId') || '')
+
+function loadParkOptions() {
+  try {
+    const raw = localStorage.getItem('parks')
+    parkOptions.value = raw ? JSON.parse(raw) : []
+    if (!selectedParkId.value && parkOptions.value.length) {
+      selectedParkId.value = String(parkOptions.value[0].id)
+      localStorage.setItem('parkId', selectedParkId.value)
+    }
+  } catch {
+    parkOptions.value = []
+  }
+}
+
+async function onParkChange() {
+  const v = selectedParkId.value
+  if (v) {
+    localStorage.setItem('parkId', v)
+  } else {
+    localStorage.removeItem('parkId')
+  }
+  await fetchMenuTree()
+}
 
 const userWidgetRef = ref(null)
 const userDropdownVisible = ref(false)
@@ -181,11 +217,37 @@ async function fetchUserDetail() {
   }
 }
 
+function collectMenuPaths(roots) {
+  const paths = []
+  for (const r of roots || []) {
+    for (const c of r.children || []) {
+      if (c.path) paths.push(c.path)
+    }
+  }
+  return paths
+}
+
+/** 切换园区或首次加载后：无菜单则进无权限页；当前页不在可见菜单里则跳到第一个可见页 */
+function redirectByMenuAccess() {
+  const paths = collectMenuPaths(menuRoots.value)
+  const cur = route.path
+  if (paths.length === 0) {
+    if (cur !== '/admin/no-access') {
+      router.replace('/admin/no-access')
+    }
+    return
+  }
+  if (cur === '/admin/no-access' || !paths.includes(cur)) {
+    router.replace(paths[0])
+  }
+}
+
 async function fetchMenuTree() {
   try {
     const res = await menuApi.tree({})
     if (res.code === 200) {
       menuRoots.value = res.data || []
+      redirectByMenuAccess()
     } else {
       flash(res.msg || '获取菜单失败', 'error')
     }
@@ -266,6 +328,7 @@ function onGlobalClick(e) {
 
 onMounted(() => {
   document.addEventListener('click', onGlobalClick)
+  loadParkOptions()
   fetchMenuTree()
 })
 
@@ -355,7 +418,27 @@ onBeforeUnmount(() => {
 .main-topbar {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.park-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: auto;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.park-select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  min-width: 140px;
+  font-size: 0.9rem;
 }
 
 .user-widget {

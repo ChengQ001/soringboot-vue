@@ -1,10 +1,12 @@
 package com.chengq.app.implcontroller;
 
 import com.chengq.api.controller.PermissionController;
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.RoleMenuBindRequest;
+import com.chengq.api.model.UserRoleBindRequest;
+import com.chengq.api.model.UserRoleDetailRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.RoleMenuService;
-import com.chengq.app.service.interfaces.UserRoleService;
+import com.chengq.app.service.interfaces.IRoleMenuService;
+import com.chengq.app.service.interfaces.IUserRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,30 +16,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermissionControllerImpl implements PermissionController {
 
     @Autowired
-    private RoleMenuService roleMenuService;
+    private IRoleMenuService roleMenuService;
 
     @Autowired
-    private UserRoleService userRoleService;
+    private IUserRoleService userRoleService;
 
     @Override
-    public ApiResponse<Void> bindRoleMenus(RoleMenuBindRequest request) {
+    public ApiResponse<Boolean> bindRoleMenus(RoleMenuBindRequest request) {
         roleMenuService.bindRoleMenus(request.getRoleId(), request.getMenuIds(), request.getParkId());
-        return ApiResponse.success(null);
+        return ApiResponse.success(true);
     }
 
     @Override
-    public ApiResponse<Void> bindUserRoles(UserRoleBindRequest request) {
+    public ApiResponse<Boolean> bindUserRoles(UserRoleBindRequest request) {
         userRoleService.bindUserRoles(request.getUserId(), request.getRoleIds(), request.getParkId());
-        return ApiResponse.success(null);
+        return ApiResponse.success(true);
     }
 
     @Override
-    public ApiResponse<java.util.List<Long>> getRoleMenuIds(IdRequest request) {
-        return ApiResponse.success(roleMenuService.getMenuIdsByRoleId(request.getId()));
+    public ApiResponse<java.util.List<Long>> getRoleMenuIds(UserRoleDetailRequest request) {
+        return ApiResponse.success(roleMenuService.getMenuIdsByRoleId(request.getId(), request.getParkId()));
     }
 
     @Override
-    public ApiResponse<java.util.List<Long>> getUserRoleIds(IdRequest request) {
-        return ApiResponse.success(userRoleService.getRoleIdsByUserId(request.getId()));
+    public ApiResponse<java.util.List<Long>> getUserRoleIds(UserRoleDetailRequest request) {
+        return ApiResponse.success(userRoleService.getRoleIdsByUserId(request.getId(), request.getParkId()));
     }
 }

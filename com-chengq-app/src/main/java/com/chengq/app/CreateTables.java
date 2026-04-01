@@ -151,14 +151,12 @@ public class CreateTables {
             // 插入初始数据
             // 插入角色数据
             String insertRoleSQL = "INSERT IGNORE INTO tb_role (name, description, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name) " +
-                    "VALUES ('ADMIN', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system'), " +
-                    "('USER', '普通用户', NOW(), 1, 'system', NOW(), 1, 'system')";
+                    "VALUES ('ADMIN', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system')";
             stmt.executeUpdate(insertRoleSQL);
             
             // 插入用户数据（密码为123456的BCrypt加密值）
             String insertUserSQL = "INSERT IGNORE INTO tb_user (username, phone, password, description, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name) " +
-                    "VALUES ('admin', '13800138000', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system'), " +
-                    "('user', '13900139000', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6', '普通用户', NOW(), 1, 'system', NOW(), 1, 'system')";
+                    "VALUES ('admin', '17688888888', '$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6', '系统管理员', NOW(), 1, 'system', NOW(), 1, 'system')";
             stmt.executeUpdate(insertUserSQL);
 
             // 插入默认园区数据
@@ -186,72 +184,16 @@ public class CreateTables {
                     "('用户-角色绑定', 'bind-user-role', '/admin/bind-user-role', @auth_menu_id, 10, '用户-角色绑定菜单', NOW(), 1, 'system', NOW(), 1, 'system'), " +
                     "('园区管理', 'park-manage', '/admin/parks', @auth_menu_id, 20, '园区管理菜单', NOW(), 1, 'system', NOW(), 1, 'system')";
             stmt.executeUpdate(insertChildMenuSQL);
-            
-            // 插入角色-菜单映射数据（两层关系：USER 映射 system 根 + system 子节点）
-            // 注意：这里用 INSERT IGNORE，避免重复插入。
-            String insertRoleMenuSQL =
-                    "INSERT IGNORE INTO tb_role_menu (role_id, menu_id, park_id, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name) VALUES "
+
+            // ADMIN 无需 tb_role_menu；仅绑定 admin 用户与 ADMIN 角色（与 sql/init_database.sql 对齐）
+            String insertUserRoleSQL =
+                    "INSERT IGNORE INTO tb_user_role (user_id, role_id, park_id, created_at, created_by, created_by_name, updated_at, updated_by, updated_by_name) VALUES "
                             + "("
+                            + "  (SELECT id FROM tb_user WHERE username='admin' AND deleted=0 LIMIT 1),"
                             + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='system' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='user' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='role' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='menu' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='auth' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='bind-role-menu' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='bind-user-role' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='ADMIN' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='park-manage' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='system' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='user' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='role' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + "),"
-                            + "("
-                            + "  (SELECT id FROM tb_role WHERE name='USER' AND deleted=0 LIMIT 1),"
-                            + "  (SELECT id FROM tb_menu WHERE code='menu' AND deleted=0 LIMIT 1),"
-                            + "  NULL, NOW(), 1, 'system', NOW(), 1, 'system'"
-                            + ") ;";
-            stmt.executeUpdate(insertRoleMenuSQL);
+                            + "  1, NOW(), 1, 'system', NOW(), 1, 'system'"
+                            + ")";
+            stmt.executeUpdate(insertUserRoleSQL);
 
             System.out.println("Initial data inserted successfully");
             

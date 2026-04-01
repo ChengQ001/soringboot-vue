@@ -1,6 +1,8 @@
 package com.chengq.api.controller;
 
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.RoleMenuBindRequest;
+import com.chengq.api.model.UserRoleBindRequest;
+import com.chengq.api.model.UserRoleDetailRequest;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,100 +10,32 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 /**
  * 权限管理控制器接口
  */
 @RequestMapping("/permissions")
 @Tag(name = "Permission Management", description = "Permission Management API")
 public interface PermissionController {
-    
+
     /**
      * 绑定角色和菜单
      */
     @PostMapping("/role-menus")
-    @Operation(summary = "绑定角色菜单", description = "绑定角色和菜单")
-    ApiResponse<Void> bindRoleMenus(@RequestBody RoleMenuBindRequest request);
-    
+    @Operation(summary = "绑定角色菜单", description = "非 ADMIN 角色按园区写入 tb_role_menu；ADMIN 拥有全量菜单，不允许调用本接口修改绑定")
+    ApiResponse<Boolean> bindRoleMenus(@RequestBody RoleMenuBindRequest request);
+
     /**
      * 绑定用户和角色
      */
     @PostMapping("/user-roles")
     @Operation(summary = "绑定用户角色", description = "绑定用户和角色")
-    ApiResponse<Void> bindUserRoles(@RequestBody UserRoleBindRequest request);
+    ApiResponse<Boolean> bindUserRoles(@RequestBody UserRoleBindRequest request);
 
     @PostMapping("/role-menus/detail")
-    @Operation(summary = "查询角色菜单绑定", description = "返回 roleId 下当前绑定的 menuIds")
-    ApiResponse<java.util.List<Long>> getRoleMenuIds(@RequestBody IdRequest request);
+    @Operation(summary = "查询角色菜单绑定", description = "id 为 roleId；须指定 parkId。ADMIN 角色返回全部菜单 id（仅展示用，不持久化依赖）；其它角色：本园区有绑定则仅返回本园区，否则返回 park_id 为 NULL 的全局绑定")
+    ApiResponse<java.util.List<Long>> getRoleMenuIds(@RequestBody UserRoleDetailRequest request);
 
     @PostMapping("/user-roles/detail")
-    @Operation(summary = "查询用户角色绑定", description = "返回 userId 下当前绑定的 roleIds")
-    ApiResponse<java.util.List<Long>> getUserRoleIds(@RequestBody IdRequest request);
-    
-    /**
-     * 角色菜单绑定请求
-     */
-    class RoleMenuBindRequest {
-        private Long roleId;
-        private List<Long> menuIds;
-        private Long parkId;
-        
-        public Long getRoleId() {
-            return roleId;
-        }
-        
-        public void setRoleId(Long roleId) {
-            this.roleId = roleId;
-        }
-        
-        public List<Long> getMenuIds() {
-            return menuIds;
-        }
-        
-        public void setMenuIds(List<Long> menuIds) {
-            this.menuIds = menuIds;
-        }
-        
-        public Long getParkId() {
-            return parkId;
-        }
-        
-        public void setParkId(Long parkId) {
-            this.parkId = parkId;
-        }
-    }
-    
-    /**
-     * 用户角色绑定请求
-     */
-    class UserRoleBindRequest {
-        private Long userId;
-        private List<Long> roleIds;
-        private Long parkId;
-        
-        public Long getUserId() {
-            return userId;
-        }
-        
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-        
-        public List<Long> getRoleIds() {
-            return roleIds;
-        }
-        
-        public void setRoleIds(List<Long> roleIds) {
-            this.roleIds = roleIds;
-        }
-        
-        public Long getParkId() {
-            return parkId;
-        }
-        
-        public void setParkId(Long parkId) {
-            this.parkId = parkId;
-        }
-    }
+    @Operation(summary = "查询用户角色绑定", description = "返回指定用户、指定园区下绑定的 roleIds；parkId 为空时仅查询 tb_user_role.park_id 为 NULL 的行")
+    ApiResponse<java.util.List<Long>> getUserRoleIds(@RequestBody UserRoleDetailRequest request);
 }

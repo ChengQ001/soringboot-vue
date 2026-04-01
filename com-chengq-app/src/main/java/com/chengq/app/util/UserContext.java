@@ -1,15 +1,15 @@
 package com.chengq.app.util;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import com.chengq.api.entity.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 用户上下文工具类
@@ -43,6 +43,17 @@ public class UserContext {
         Authentication authentication = getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             return authentication.getName();
+        }
+        return null;
+    }
+
+    /**
+     * 当前登录用户主键（principal 为 {@link User} 时有效）
+     */
+    public static Long getCurrentUserId() {
+        UserDetails ud = getCurrentUserDetails();
+        if (ud instanceof User) {
+            return ((User) ud).getId();
         }
         return null;
     }

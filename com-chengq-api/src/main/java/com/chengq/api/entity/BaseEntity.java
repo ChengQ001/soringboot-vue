@@ -1,9 +1,8 @@
 package com.chengq.api.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 基础实体类

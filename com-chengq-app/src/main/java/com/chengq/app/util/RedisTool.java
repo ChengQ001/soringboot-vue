@@ -1,13 +1,11 @@
 package com.chengq.app.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Map;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Redis 简易“工具”封装：统一 key/hashKey 用 String，value/hashValue 用 JSON。

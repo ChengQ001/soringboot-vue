@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.chengq.app", "com.chengq.api"})
-@MapperScan(basePackages = {"com.chengq.api.mapper"})
+@MapperScan(basePackages = {"com.chengq.app.mapper"})
 @Slf4j
 public class Application {
     public static void main(String[] args) {

@@ -5,21 +5,20 @@ import com.chengq.api.model.DeleteUserRequest;
 import com.chengq.api.model.UpdateUserRequest;
 import com.chengq.api.model.UserRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.UserService;
+import com.chengq.app.service.interfaces.IUserService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
 public class UserControllerImpl implements UserController {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Override
     public ApiResponse<List<String>> getUsers(UserRequest request) {

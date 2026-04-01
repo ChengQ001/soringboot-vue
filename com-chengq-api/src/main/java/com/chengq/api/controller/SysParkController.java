@@ -8,11 +8,10 @@ import com.chengq.api.model.SysParkVO;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 /**
  * 园区管理（CRUD，全部 POST）
@@ -35,6 +34,6 @@ public interface SysParkController {
 
     @PostMapping("/delete")
     @Operation(summary = "删除园区")
-    ApiResponse<Void> delete(@RequestBody IdRequest request);
+    ApiResponse<Boolean> delete(@RequestBody IdRequest request);
 }
 

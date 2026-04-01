@@ -5,19 +5,18 @@ import com.chengq.api.entity.Role;
 import com.chengq.api.model.EmptyRequest;
 import com.chengq.api.model.IdRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.RoleService;
+import com.chengq.app.service.interfaces.IRoleService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
 public class RoleControllerImpl implements RoleController {
 
     @Autowired
-    private RoleService roleService;
+    private IRoleService roleService;
 
     @Override
     public ApiResponse<Role> createRole(Role role) {
@@ -30,9 +29,9 @@ public class RoleControllerImpl implements RoleController {
     }
 
     @Override
-    public ApiResponse<Void> deleteRole(IdRequest request) {
+    public ApiResponse<Boolean> deleteRole(IdRequest request) {
         roleService.deleteRole(request.getId());
-        return ApiResponse.success(null);
+        return ApiResponse.success(true);
     }
 
     @Override

@@ -2,7 +2,8 @@ package com.chengq.app.config;
 
 import com.chengq.api.model.base.ApiResponse;
 import com.chengq.app.filter.JwtAuthenticationFilter;
-import com.chengq.app.service.interfaces.UserService;
+import com.chengq.app.filter.ParkContextFilter;
+import com.chengq.app.service.interfaces.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +36,7 @@ public class SecurityConfig {
     
     // 用户服务，用于加载用户信息
     @Autowired
-    private UserService userService;
+    private IUserService userService;
     
     // JSON序列化工具
     @Autowired
@@ -49,7 +50,9 @@ public class SecurityConfig {
      * 配置安全过滤器链
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   ParkContextFilter parkContextFilter) throws Exception {
         http
                 // 禁用CSRF保护（REST API通常不需要）
                 .csrf(csrf -> csrf.disable())
@@ -75,6 +78,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 // 添加JWT认证过滤器，在UsernamePasswordAuthenticationFilter之前执行
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(parkContextFilter, JwtAuthenticationFilter.class)
                 // 配置异常处理
                 .exceptionHandling(exception -> exception
                         // 未认证异常处理

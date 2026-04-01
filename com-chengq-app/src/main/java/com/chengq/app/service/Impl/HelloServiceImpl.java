@@ -1,7 +1,7 @@
 package com.chengq.app.service.Impl;
 
 import com.chengq.api.model.HelloRequest;
-import com.chengq.app.service.HelloService;
+import com.chengq.app.service.interfaces.IHelloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class HelloServiceImpl implements HelloService {
+public class HelloServiceImpl implements IHelloService {
 
     /**
      * 返回Hello消息

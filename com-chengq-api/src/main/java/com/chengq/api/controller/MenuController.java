@@ -7,11 +7,10 @@ import com.chengq.api.model.ParentIdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 /**
  * 菜单管理：全部使用 POST + JSON Body
@@ -30,7 +29,7 @@ public interface MenuController {
 
     @PostMapping("/delete")
     @Operation(summary = "删除菜单", description = "根据 id 删除菜单")
-    ApiResponse<Void> deleteMenu(@RequestBody IdRequest request);
+    ApiResponse<Boolean> deleteMenu(@RequestBody IdRequest request);
 
     @PostMapping("/detail")
     @Operation(summary = "获取菜单", description = "根据 id 查询菜单")

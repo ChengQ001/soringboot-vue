@@ -7,5 +7,6 @@ import lombok.Data;
  */
 @Data
 public class IdRequest {
+    /** 业务主键（含义依接口而定：用户/角色/菜单等） */
     private Long id;
 }

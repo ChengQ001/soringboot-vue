@@ -6,7 +6,7 @@ import com.chengq.api.model.LoginResponse;
 import com.chengq.api.model.RegisterRequest;
 import com.chengq.api.model.UpdateUserRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.app.service.interfaces.UserService;
+import com.chengq.app.service.interfaces.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthControllerImpl implements AuthController {
     
     @Autowired
-    private UserService userService;
+    private IUserService userService;
     
     @Override
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {

@@ -29,7 +29,15 @@
             <td>{{ u.description }}</td>
             <td class="actions">
               <button type="button" class="btn sm" @click="openEdit(u)">编辑</button>
-              <button type="button" class="btn sm danger" @click="remove(u)">删除</button>
+              <button
+                type="button"
+                class="btn sm danger"
+                :disabled="isAdminUser(u)"
+                :title="isAdminUser(u) ? '系统保留账号，不可删除' : ''"
+                @click="remove(u)"
+              >
+                删除
+              </button>
             </td>
           </tr>
         </tbody>
@@ -82,6 +90,10 @@ const form = ref({
   password: '',
   description: ''
 })
+
+function isAdminUser(u) {
+  return String(u?.username || '').toLowerCase() === 'admin'
+}
 
 async function load() {
   try {
@@ -152,6 +164,10 @@ async function submit() {
 }
 
 async function remove(u) {
+  if (isAdminUser(u)) {
+    flash('admin 账号为系统保留账号，禁止删除', 'error')
+    return
+  }
   if (!confirm('确定删除该用户？')) return
   try {
     const res = await sysUserApi.delete({ id: u.id })
@@ -230,6 +246,19 @@ onMounted(load)
 }
 .actions {
   white-space: nowrap;
+}
+.btn:disabled,
+.btn.sm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: #aaa !important;
+  border-color: #e5e5e5 !important;
+  background: #f3f3f3 !important;
+  box-shadow: none;
+}
+.btn.danger:disabled {
+  color: #bbb !important;
+  border-color: #ececec !important;
 }
 .modal-mask {
   position: fixed;

@@ -23,9 +23,25 @@
             <td>{{ r.id }}</td>
             <td>{{ r.name }}</td>
             <td>{{ r.description }}</td>
-            <td>
-              <button type="button" class="btn sm" @click="openEdit(r)">编辑</button>
-              <button type="button" class="btn sm danger" @click="remove(r)">删除</button>
+            <td class="actions">
+              <button
+                type="button"
+                class="btn sm"
+                :disabled="isAdminRole(r)"
+                :title="isAdminRole(r) ? '系统保留角色，不可编辑' : ''"
+                @click="openEdit(r)"
+              >
+                编辑
+              </button>
+              <button
+                type="button"
+                class="btn sm danger"
+                :disabled="isAdminRole(r)"
+                :title="isAdminRole(r) ? '系统保留角色，不可删除' : ''"
+                @click="remove(r)"
+              >
+                删除
+              </button>
             </td>
           </tr>
         </tbody>
@@ -65,6 +81,10 @@ const saving = ref(false)
 const reloading = ref(false)
 const form = ref({ id: null, name: '', description: '' })
 
+function isAdminRole(r) {
+  return String(r?.name || '').toUpperCase() === 'ADMIN'
+}
+
 async function load() {
   try {
     const res = await roleApi.list({})
@@ -92,6 +112,10 @@ function openAdd() {
 }
 
 function openEdit(r) {
+  if (isAdminRole(r)) {
+    flash('ADMIN 角色为系统保留角色，禁止修改', 'error')
+    return
+  }
   form.value = { id: r.id, name: r.name || '', description: r.description || '' }
   dialog.value = { mode: 'edit' }
 }
@@ -118,6 +142,10 @@ async function submit() {
 }
 
 async function remove(r) {
+  if (isAdminRole(r)) {
+    flash('ADMIN 角色为系统保留角色，禁止删除', 'error')
+    return
+  }
   if (!confirm('确定删除？')) return
   try {
     const res = await roleApi.remove({ id: r.id })
@@ -228,5 +256,21 @@ onMounted(load)
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+.actions {
+  white-space: nowrap;
+}
+.btn:disabled,
+.btn.sm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: #aaa !important;
+  border-color: #e5e5e5 !important;
+  background: #f3f3f3 !important;
+  box-shadow: none;
+}
+.btn.danger:disabled {
+  color: #bbb !important;
+  border-color: #ececec !important;
 }
 </style>

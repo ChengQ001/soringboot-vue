@@ -57,6 +57,11 @@ const router = createRouter({
           path: 'parks',
           name: 'ParkManage',
           component: () => import('../views/admin/ParkManage.vue')
+        },
+        {
+          path: 'no-access',
+          name: 'AdminNoAccess',
+          component: () => import('../views/admin/NoAccess.vue')
         }
       ]
     }

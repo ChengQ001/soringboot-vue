@@ -36,13 +36,10 @@
           {{ loading ? '登录中...' : '登录' }}
         </button>
         <div class="default-accounts">
-          <div class="default-title">内置账号（手机号登录）</div>
+          <div class="default-title">开箱默认账号（初始化脚本仅创建此项）</div>
           <div class="default-row">
             <button type="button" class="pill" @click="fillDefault('admin')">
-              管理员：admin / 13800138000 / 123456
-            </button>
-            <button type="button" class="pill" @click="fillDefault('user')">
-              用户:user / 13900139000 / 123456
+              admin / 17688888888 / 123456
             </button>
           </div>
         </div>
@@ -73,10 +70,7 @@ const passwordVisible = ref(false)
 
 function fillDefault(kind) {
   if (kind === 'admin') {
-    form.value.phone = '13800138000'
-    form.value.password = '123456'
-  } else if (kind === 'user') {
-    form.value.phone = '13900139000'
+    form.value.phone = '17688888888'
     form.value.password = '123456'
   }
   passwordVisible.value = false
@@ -97,11 +91,36 @@ const handleLogin = async () => {
     const payload = { phone, password: form.value.password }
     const response = await authApi.login(payload)
     if (response.code === 200) {
-      const { token, username } = response.data
+      const { token, username, defaultParkId, parks, id, phone, roleIds } = response.data
       const tokenValue = token.replace(/^Bearer\s+/i, '')
       localStorage.setItem('token', tokenValue)
       if (username) {
         localStorage.setItem('username', username)
+      }
+      if (id != null && id !== '') {
+        localStorage.setItem('userId', String(id))
+      } else {
+        localStorage.removeItem('userId')
+      }
+      if (phone) {
+        localStorage.setItem('phone', phone)
+      } else {
+        localStorage.removeItem('phone')
+      }
+      if (defaultParkId != null) {
+        localStorage.setItem('parkId', String(defaultParkId))
+      } else {
+        localStorage.removeItem('parkId')
+      }
+      if (parks && Array.isArray(parks)) {
+        localStorage.setItem('parks', JSON.stringify(parks))
+      } else {
+        localStorage.removeItem('parks')
+      }
+      if (roleIds && Array.isArray(roleIds) && roleIds.length) {
+        localStorage.setItem('roleIds', JSON.stringify(roleIds))
+      } else {
+        localStorage.removeItem('roleIds')
       }
       router.push('/admin/menus')
     } else {

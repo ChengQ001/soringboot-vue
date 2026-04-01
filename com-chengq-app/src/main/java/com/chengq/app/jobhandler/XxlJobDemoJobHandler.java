@@ -1,7 +1,7 @@
 package com.chengq.app.jobhandler;
 
-import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

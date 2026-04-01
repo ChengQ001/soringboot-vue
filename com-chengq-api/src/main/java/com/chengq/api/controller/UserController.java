@@ -1,24 +1,22 @@
 package com.chengq.api.controller;
 
+import com.chengq.api.annotation.RequiresPermission;
 import com.chengq.api.model.DeleteUserRequest;
 import com.chengq.api.model.UserRequest;
 import com.chengq.api.model.base.ApiResponse;
-import com.chengq.api.annotation.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-
-import java.util.List;
 
 /**
  * 用户管理控制器接口

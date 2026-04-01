@@ -6,11 +6,10 @@ import com.chengq.api.model.IdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 /**
  * 角色管理：全部使用 POST + JSON Body
@@ -29,7 +28,7 @@ public interface RoleController {
 
     @PostMapping("/delete")
     @Operation(summary = "删除角色", description = "根据 id 删除角色")
-    ApiResponse<Void> deleteRole(@RequestBody IdRequest request);
+    ApiResponse<Boolean> deleteRole(@RequestBody IdRequest request);
 
     @PostMapping("/detail")
     @Operation(summary = "获取角色", description = "根据 id 查询角色")

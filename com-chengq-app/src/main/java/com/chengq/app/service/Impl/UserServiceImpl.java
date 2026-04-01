@@ -1,19 +1,25 @@
 package com.chengq.app.service.Impl;
 
-import com.chengq.api.entity.User;
+import com.chengq.api.entity.Park;
 import com.chengq.api.entity.Role;
+import com.chengq.api.entity.User;
 import com.chengq.api.entity.UserRole;
-import com.chengq.api.mapper.UserMapper;
-import com.chengq.api.mapper.RoleMapper;
-import com.chengq.api.mapper.UserRoleMapper;
+import com.chengq.app.mapper.RoleMapper;
+import com.chengq.app.mapper.UserMapper;
+import com.chengq.app.mapper.UserRoleMapper;
 import com.chengq.api.model.DeleteUserRequest;
 import com.chengq.api.model.LoginRequest;
 import com.chengq.api.model.LoginResponse;
+import com.chengq.api.model.ParkLoginItem;
 import com.chengq.api.model.RegisterRequest;
 import com.chengq.api.model.UpdateUserRequest;
 import com.chengq.api.model.UserRequest;
-import com.chengq.app.service.interfaces.UserService;
+import com.chengq.app.service.interfaces.IParkAccessService;
+import com.chengq.app.service.interfaces.IUserService;
 import com.chengq.app.util.JwtUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,36 +28,35 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * 用户业务层实现类
  * 实现用户相关的业务逻辑，使用MyBatis Plus进行数据库操作
  */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
     private final UserRoleMapper userRoleMapper;
     private final RoleMapper roleMapper;
+    private final IParkAccessService parkAccessService;
 
     public UserServiceImpl(
             PasswordEncoder passwordEncoder,
             JwtUtil jwtUtil,
             UserMapper userMapper,
             UserRoleMapper userRoleMapper,
-            RoleMapper roleMapper
+            RoleMapper roleMapper,
+            IParkAccessService parkAccessService
     ) {
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.userMapper = userMapper;
         this.userRoleMapper = userRoleMapper;
         this.roleMapper = roleMapper;
+        this.parkAccessService = parkAccessService;
         initUsers();
     }
 
@@ -67,7 +72,7 @@ public class UserServiceImpl implements UserService {
                 
                 User admin = new User();
                 admin.setUsername("admin");
-                admin.setPhone("13800138000");
+                admin.setPhone("17688888888");
                 admin.setPassword("$2a$10$7q4QMsPIQPZhyEkttFQQ9uNPQhHxcT1ZtdFYwCQOLDIWMsWXYvNV6");
                 admin.setDescription("系统管理员");
                 userMapper.insert(admin);
@@ -136,9 +141,35 @@ public class UserServiceImpl implements UserService {
             // 签发 JWT：subject 放用户名（用于后续 JwtAuthenticationFilter loadUserByUsername(username））
             String token = jwtUtil.generateToken(user);
             System.out.println("Token generated: " + token);
-            
+
+            User full = getUserByUsername(user.getUsername());
+            String primaryRole = "USER";
+            LoginResponse resp = new LoginResponse("Bearer " + token, full.getUsername(), primaryRole);
+            resp.setId(full.getId());
+            resp.setPhone(full.getPhone());
+            if (full.getRoles() != null) {
+                for (Role r : full.getRoles()) {
+                    if (r != null && r.getName() != null) {
+                        resp.getRoles().add(r.getName());
+                        resp.getRoleIds().add(r.getId());
+                    }
+                }
+                if (!resp.getRoles().isEmpty()) {
+                    resp.setRole(resp.getRoles().get(0));
+                }
+            }
+            List<Park> parks = parkAccessService.listAccessibleParks(full.getId());
+            for (Park p : parks) {
+                if (p != null && p.getId() != null) {
+                    resp.getParks().add(new ParkLoginItem(p.getId(), p.getName()));
+                }
+            }
+            if (!resp.getParks().isEmpty()) {
+                resp.setDefaultParkId(resp.getParks().get(0).getId());
+            }
+
             System.out.println("Login successful for phone: " + phone);
-            return new LoginResponse("Bearer " + token, user.getUsername(), "USER");
+            return resp;
             
         } catch (Exception e) {
             System.out.println("Login error: " + e.getMessage());
@@ -240,6 +271,10 @@ public class UserServiceImpl implements UserService {
     public String deleteUser(DeleteUserRequest request) {
         try {
             log.info("Deleting user with id: {}", request.getId());
+            User user = userMapper.selectById(request.getId());
+            if (user != null && "admin".equalsIgnoreCase(user.getUsername())) {
+                throw new RuntimeException("admin 账号为系统保留账号，禁止删除");
+            }
             userMapper.deleteById(request.getId());
             return "User deleted successfully: " + request.getId();
         } catch (Exception e) {
