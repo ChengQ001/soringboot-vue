@@ -16,11 +16,21 @@ export function setNavigateToLogin(fn) {
   navigateToLogin = typeof fn === 'function' ? fn : null
 }
 
+/** 与 Vue Router hash 模式一致，供无 router 实例时的兜底跳转 */
+function loginPageUrl() {
+  const base = import.meta.env.BASE_URL || '/'
+  if (base === '/' || base === './') {
+    return `${window.location.origin}/#/login`
+  }
+  const trimmed = base.replace(/\.\//, '').replace(/\/$/, '')
+  return `${window.location.origin}/${trimmed}/#/login`
+}
+
 function goLogin() {
   if (navigateToLogin) {
     navigateToLogin()
   } else {
-    window.location.replace(`${window.location.origin}/login`)
+    window.location.replace(loginPageUrl())
   }
 }
 

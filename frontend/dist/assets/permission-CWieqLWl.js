@@ -1,1 +1,0 @@
-import{a as e}from"./axios-CHq4XjDU.js";const i={bindRoleMenus:s=>e.post("/permissions/role-menus",s),bindUserRoles:s=>e.post("/permissions/user-roles",s),getRoleMenuIds:s=>e.post("/permissions/role-menus/detail",s),getUserRoleIds:s=>e.post("/permissions/user-roles/detail",s)};export{i as p};

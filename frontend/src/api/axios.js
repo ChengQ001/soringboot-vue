@@ -39,7 +39,11 @@ apiClient.interceptors.response.use(
     const reqUrl = error.config?.url || ''
     const isLogoutRequest = reqUrl.includes('/auth/logout')
     if (isUnauthorized && !isLogoutRequest) {
-      const path = window.location.pathname || ''
+      // Hash 模式下路由在 location.hash，pathname 多为 '/'，不能用 pathname 判断公开页
+      let path = window.location.pathname || ''
+      if (window.location.hash && window.location.hash.startsWith('#')) {
+        path = window.location.hash.slice(1).split('?')[0] || '/'
+      }
       const isPublic = path === '/login' || path === '/register'
       if (!isPublic) {
         logoutLocal()

@@ -1,8 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { isLoggedIn } from '../utils/auth'
 
+/**
+ * Hash 模式：地址为 /#/admin/menus，不依赖 Nginx 的 history 回退配置，
+ * 静态资源丢到云服务器子目录或只配 root 也能正常跳转。
+ * 若必须用「干净路径」，再改回 createWebHistory(import.meta.env.BASE_URL) 并在服务端配置 try_files。
+ */
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
