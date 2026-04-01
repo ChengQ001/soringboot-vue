@@ -3,7 +3,7 @@ package com.chengq.app.implcontroller;
 import com.chengq.api.controller.MenuController;
 import com.chengq.api.entity.Menu;
 import com.chengq.api.model.EmptyRequest;
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.base.IdRequest;
 import com.chengq.api.model.ParentIdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import com.chengq.app.service.interfaces.IMenuService;
