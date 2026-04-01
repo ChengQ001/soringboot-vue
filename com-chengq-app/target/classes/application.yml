@@ -50,6 +50,24 @@ spring:
         min-idle: 0
         max-wait: -1
 
+  # RabbitMQ 配置
+#  rabbitmq:
+#    host: 127.0.0.1
+#    port: 5672
+#    username: guest
+#    password: guest
+#    virtual-host: /
+#    # 连接超时时间（毫秒）
+#    connection-timeout: 60000
+#    # 启用自动重试
+#    template:
+#      retry:
+#        enabled: true
+#        initial-interval: 1000
+#        max-interval: 10000
+#        multiplier: 2.0
+#        max-attempts: 3
+
 # MyBatis Plus Configuration
 mybatis-plus:
   # Mapper XML文件位置

@@ -61,6 +61,7 @@ public class SecurityConfig {
                         // 白名单：不需要认证的路径
                 .antMatchers("/auth/login").permitAll() // 登录接口
                 .antMatchers("/auth/register").permitAll() // 注册接口
+                .antMatchers("/mq/**").permitAll() // RabbitMQ测试接口
                 .antMatchers("/swagger-ui/**", "/swagger/**", "/api-docs/**").permitAll() // Swagger文档
                         // 其他所有路径都需要认证
                         .anyRequest().authenticated()

@@ -5,6 +5,7 @@ com\chengq\app\implcontroller\MenuControllerImpl.class
 com\chengq\app\service\interfaces\ISysParkService.class
 com\chengq\app\exception\BizCodes.class
 com\chengq\app\implcontroller\SysParkControllerImpl.class
+com\chengq\app\mq\RabbitMQConsumer.class
 com\chengq\app\implcontroller\SysUserControllerImpl.class
 com\chengq\app\service\Impl\UserRoleBatchServiceImpl.class
 com\chengq\app\service\interfaces\IRoleMenuService.class
@@ -23,9 +24,11 @@ com\chengq\app\mapper\RoleMenuMapper.class
 com\chengq\app\implcontroller\AuthControllerImpl.class
 com\chengq\app\mapper\RoleMapper.class
 com\chengq\app\filter\JwtAuthenticationFilter.class
+com\chengq\app\mq\RabbitMQProducer.class
 com\chengq\app\util\JwtUtil.class
 com\chengq\app\CreateTables.class
 com\chengq\app\service\interfaces\IMenuService.class
+com\chengq\app\implcontroller\RabbitMQController.class
 com\chengq\app\config\PasswordConfig.class
 com\chengq\app\util\UserContext.class
 com\chengq\app\implcontroller\PermissionControllerImpl.class
@@ -38,6 +41,7 @@ com\chengq\app\config\SecurityConfig.class
 com\chengq\app\service\Impl\RoleServiceImpl.class
 com\chengq\app\service\interfaces\IUserService.class
 com\chengq\app\service\interfaces\IRoleService.class
+com\chengq\app\config\RabbitMQConfig.class
 com\chengq\app\util\RedisTool.class
 com\chengq\app\service\Impl\UserServiceImpl.class
 com\chengq\app\service\interfaces\IUserRoleService.class

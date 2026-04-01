@@ -13,9 +13,12 @@ D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\Im
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\mapper\UserMapper.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\interfaces\ISysParkService.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\filter\ParkContextFilter.java
+D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\mq\RabbitMQConsumer.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\config\SwaggerConfig.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\mapper\RoleMapper.java
+D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\config\RabbitMQConfig.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\implcontroller\MenuControllerImpl.java
+D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\mq\RabbitMQProducer.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\config\RedisConfig.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\jobhandler\XxlJobDemoJobHandler.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\config\SecurityConfig.java
@@ -46,6 +49,7 @@ D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\util\ParkC
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\Impl\RoleMenuBatchServiceImpl.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\interfaces\IRoleService.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\interfaces\IMenuService.java
+D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\implcontroller\RabbitMQController.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\service\interfaces\IRoleMenuService.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\exception\GlobalExceptionHandler.java
 D:\mycode\com-chengq-boot\com-chengq-app\src\main\java\com\chengq\app\util\RedisTool.java
