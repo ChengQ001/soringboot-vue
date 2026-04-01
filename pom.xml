@@ -33,6 +33,7 @@
         <jjwt.version>0.11.5</jjwt.version>
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <hutool.version>5.8.25</hutool.version>
+        <spring-boot-amqp.version>2.7.18</spring-boot-amqp.version>
     </properties>
 
     <dependencyManagement>
@@ -116,7 +117,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-amqp</artifactId>
-                <version>2.7.18</version>
+                <version>${spring-boot-amqp.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
