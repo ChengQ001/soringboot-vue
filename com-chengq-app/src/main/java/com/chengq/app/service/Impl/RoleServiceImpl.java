@@ -2,6 +2,8 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Role;
+import com.chengq.app.exception.BizCodes;
+import com.chengq.app.exception.BizException;
 import com.chengq.app.mapper.RoleMapper;
 import com.chengq.app.service.interfaces.IRoleService;
 import java.util.List;
@@ -34,7 +36,7 @@ public class RoleServiceImpl implements IRoleService {
         log.info("Creating role: {}", role.getName());
         Role existingRole = findByName(role.getName());
         if (existingRole != null) {
-            throw new RuntimeException("角色名称已存在: " + role.getName());
+            throw new BizException(BizCodes.CONFLICT, "角色名称已存在: " + role.getName());
         }
         roleMapper.insert(role);
         log.info("Role created successfully: {}", role.getName());
@@ -46,15 +48,15 @@ public class RoleServiceImpl implements IRoleService {
         log.info("Updating role with id: {}", role.getId());
         Role existingRole = roleMapper.selectById(role.getId());
         if (existingRole == null) {
-            throw new RuntimeException("角色不存在: " + role.getId());
+            throw new BizException(BizCodes.NOT_FOUND, "角色不存在: " + role.getId());
         }
         if (ADMIN_ROLE.equals(existingRole.getName())) {
-            throw new RuntimeException("ADMIN 角色为系统保留角色，禁止修改");
+            throw new BizException(BizCodes.FORBIDDEN, "ADMIN 角色为系统保留角色，禁止修改");
         }
         if (role.getName() != null) {
             Role roleByName = findByName(role.getName());
             if (roleByName != null && !roleByName.getId().equals(role.getId())) {
-                throw new RuntimeException("角色名称已存在: " + role.getName());
+                throw new BizException(BizCodes.CONFLICT, "角色名称已存在: " + role.getName());
             }
         }
         roleMapper.updateById(role);
@@ -67,10 +69,10 @@ public class RoleServiceImpl implements IRoleService {
         log.info("Deleting role with id: {}", id);
         Role role = roleMapper.selectById(id);
         if (role == null) {
-            throw new RuntimeException("角色不存在: " + id);
+            throw new BizException(BizCodes.NOT_FOUND, "角色不存在: " + id);
         }
         if (ADMIN_ROLE.equals(role.getName())) {
-            throw new RuntimeException("ADMIN 角色为系统保留角色，禁止删除");
+            throw new BizException(BizCodes.FORBIDDEN, "ADMIN 角色为系统保留角色，禁止删除");
         }
         roleMapper.deleteById(id);
         log.info("Role deleted successfully: {}", id);
@@ -80,7 +82,7 @@ public class RoleServiceImpl implements IRoleService {
     public Role getRoleById(Long id) {
         Role role = roleMapper.selectById(id);
         if (role == null) {
-            throw new RuntimeException("角色不存在: " + id);
+            throw new BizException(BizCodes.NOT_FOUND, "角色不存在: " + id);
         }
         return role;
     }

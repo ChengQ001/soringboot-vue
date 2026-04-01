@@ -62,10 +62,6 @@ public class SecurityConfig {
                 .antMatchers("/auth/login").permitAll() // 登录接口
                 .antMatchers("/auth/register").permitAll() // 注册接口
                 .antMatchers("/swagger-ui/**", "/swagger/**", "/api-docs/**").permitAll() // Swagger文档
-                .antMatchers("/hello").permitAll() // 公开接口
-                .antMatchers("/users").permitAll() // 公开接口（使用@PreAuthorize("permitAll()")）
-                .antMatchers("/users/anonymous").permitAll() // 匿名访问接口
-                .antMatchers("/users/permit-all").permitAll() // 允许所有访问接口
                         // 其他所有路径都需要认证
                         .anyRequest().authenticated()
                 )
@@ -122,7 +118,7 @@ public class SecurityConfig {
         return (HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) -> {
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401状态码
-            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(401, "授权失败")));
+            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(401, "未登录或登录已失效")));
         };
     }
     
@@ -135,7 +131,7 @@ public class SecurityConfig {
         return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.access.AccessDeniedException accessDeniedException) -> {
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403状态码
-            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(403, "授权失败")));
+            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(403, "没有权限访问该资源")));
         };
     }
 }

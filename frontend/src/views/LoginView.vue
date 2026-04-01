@@ -91,7 +91,7 @@ const handleLogin = async () => {
     const payload = { phone, password: form.value.password }
     const response = await authApi.login(payload)
     if (response.code === 200) {
-      const { token, username, defaultParkId, parks, id, phone, roleIds } = response.data
+      const { token, username, defaultParkId, parks, id, phone, roleIds, roles } = response.data
       const tokenValue = token.replace(/^Bearer\s+/i, '')
       localStorage.setItem('token', tokenValue)
       if (username) {
@@ -121,6 +121,11 @@ const handleLogin = async () => {
         localStorage.setItem('roleIds', JSON.stringify(roleIds))
       } else {
         localStorage.removeItem('roleIds')
+      }
+      if (roles && Array.isArray(roles) && roles.length) {
+        localStorage.setItem('roles', JSON.stringify(roles))
+      } else {
+        localStorage.removeItem('roles')
       }
       router.push('/admin/menus')
     } else {

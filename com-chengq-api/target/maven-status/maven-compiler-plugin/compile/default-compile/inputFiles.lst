@@ -8,7 +8,6 @@ D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller\MenuController.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\SysParkVO.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\UserRole.java
-D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\UserRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\Park.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\BaseEntity.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller\SysParkController.java
@@ -20,17 +19,13 @@ D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\SysU
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller\RoleController.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\SysUserUpdateRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\User.java
-D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller\UserController.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\Role.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\Menu.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\UserRoleDetailRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\ParkLoginItem.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\entity\RoleMenu.java
-D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\annotation\RequiresPermission.java
-D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\DeleteUserRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\SysParkAddRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\LoginRequest.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\base\ApiResponse.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\controller\PermissionController.java
 D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\EmptyRequest.java
-D:\mycode\com-chengq-boot\com-chengq-api\src\main\java\com\chengq\api\model\HelloRequest.java

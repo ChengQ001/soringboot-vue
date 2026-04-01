@@ -2,7 +2,7 @@
  * 登录态：与 localStorage 键名、退出逻辑集中管理，便于扩展（如 refreshToken、角色等）
  */
 
-const STORAGE_KEYS = ['token', 'username', 'userId', 'phone', 'parkId', 'parks', 'roleIds']
+const STORAGE_KEYS = ['token', 'username', 'userId', 'phone', 'parkId', 'parks', 'roleIds', 'roles']
 
 /** 清空本地登录信息（不跳转） */
 export function clearAuthStorage() {

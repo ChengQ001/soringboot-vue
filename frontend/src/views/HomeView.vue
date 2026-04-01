@@ -12,7 +12,7 @@
       <p class="actions">
         <router-link class="link-admin" to="/admin">进入系统管理</router-link>
       </p>
-      <p class="hint">接口文档：<a href="http://localhost:8080/swagger" target="_blank" rel="noopener">Swagger</a></p>
+      <p class="hint">接口文档：<a href="http://localhost:8081/swagger" target="_blank" rel="noopener">Swagger</a></p>
     </main>
   </div>
 </template>

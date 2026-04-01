@@ -8,6 +8,8 @@ import com.chengq.api.entity.UserRole;
 import com.chengq.app.mapper.MenuMapper;
 import com.chengq.app.mapper.RoleMapper;
 import com.chengq.app.mapper.RoleMenuMapper;
+import com.chengq.app.exception.BizCodes;
+import com.chengq.app.exception.BizException;
 import com.chengq.app.mapper.UserRoleMapper;
 import com.chengq.app.service.interfaces.IMenuService;
 import com.chengq.app.util.ParkContext;
@@ -54,7 +56,7 @@ public class MenuServiceImpl implements IMenuService {
             throw e;
         } catch (Exception e) {
             log.error("Failed to create menu: {}", e.getMessage());
-            throw new RuntimeException("Failed to create menu: " + e.getMessage());
+            throw new BizException(BizCodes.INTERNAL_ERROR, "新增菜单失败：" + (e.getMessage() != null ? e.getMessage() : "未知原因"), e);
         }
     }
 
@@ -65,7 +67,7 @@ public class MenuServiceImpl implements IMenuService {
 
             Menu existingMenu = menuMapper.selectById(menu.getId());
             if (existingMenu == null) {
-                throw new RuntimeException("Menu not found with id: " + menu.getId());
+                throw new BizException(BizCodes.NOT_FOUND, "未找到菜单，编号：" + menu.getId());
             }
 
             applyTwoLevelAndSort(menu, existingMenu);
@@ -76,7 +78,7 @@ public class MenuServiceImpl implements IMenuService {
             throw e;
         } catch (Exception e) {
             log.error("Failed to update menu: {}", e.getMessage());
-            throw new RuntimeException("Failed to update menu: " + e.getMessage());
+            throw new BizException(BizCodes.INTERNAL_ERROR, "更新菜单失败：" + (e.getMessage() != null ? e.getMessage() : "未知原因"), e);
         }
     }
 
@@ -91,20 +93,20 @@ public class MenuServiceImpl implements IMenuService {
         if (existing != null) {
             List<Menu> children = menuMapper.selectChildrenByParentId(menu.getId());
             if (!children.isEmpty() && pid != null) {
-                throw new RuntimeException("该菜单下已有子节点，不能改为子菜单（仅支持两级）");
+                throw new BizException(BizCodes.BAD_REQUEST, "该菜单下已有子节点，不能改为子菜单（仅支持两级）");
             }
         }
 
         if (pid != null) {
             if (existing != null && pid.equals(menu.getId())) {
-                throw new RuntimeException("父菜单不能为自身");
+                throw new BizException(BizCodes.BAD_REQUEST, "父菜单不能为自身");
             }
             Menu parent = menuMapper.selectById(pid);
             if (parent == null) {
-                throw new RuntimeException("父菜单不存在");
+                throw new BizException(BizCodes.NOT_FOUND, "父菜单不存在");
             }
             if (!isRootMenu(parent)) {
-                throw new RuntimeException("仅支持两级菜单：子菜单的父级必须是一级菜单");
+                throw new BizException(BizCodes.BAD_REQUEST, "仅支持两级菜单：子菜单的父级必须是一级菜单");
             }
         }
 
@@ -154,20 +156,22 @@ public class MenuServiceImpl implements IMenuService {
             // 查询菜单是否存在
             Menu menu = menuMapper.selectById(id);
             if (menu == null) {
-                throw new RuntimeException("Menu not found with id: " + id);
+                throw new BizException(BizCodes.NOT_FOUND, "未找到菜单，编号：" + id);
             }
             
             // 检查是否有子菜单
             List<Menu> children = menuMapper.selectChildrenByParentId(id);
             if (!children.isEmpty()) {
-                throw new RuntimeException("Cannot delete menu with children");
+                throw new BizException(BizCodes.BAD_REQUEST, "该菜单下存在子菜单，请先删除子菜单");
             }
             
             menuMapper.deleteById(id);
             log.info("Menu deleted successfully: {}", id);
+        } catch (BizException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Failed to delete menu: {}", e.getMessage());
-            throw new RuntimeException("Failed to delete menu: " + e.getMessage());
+            throw new BizException(BizCodes.INTERNAL_ERROR, "删除菜单失败：" + (e.getMessage() != null ? e.getMessage() : "未知原因"), e);
         }
     }
 
@@ -175,7 +179,7 @@ public class MenuServiceImpl implements IMenuService {
     public Menu getMenuById(Long id) {
         Menu menu = menuMapper.selectById(id);
         if (menu == null) {
-            throw new RuntimeException("Menu not found with id: " + id);
+            throw new BizException(BizCodes.NOT_FOUND, "未找到菜单，编号：" + id);
         }
         return menu;
     }

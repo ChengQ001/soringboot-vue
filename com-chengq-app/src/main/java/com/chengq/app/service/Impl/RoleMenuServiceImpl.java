@@ -3,12 +3,14 @@ package com.chengq.app.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Menu;
 import com.chengq.api.entity.Role;
+import com.chengq.app.exception.BizCodes;
+import com.chengq.app.exception.BizException;
 import com.chengq.api.entity.RoleMenu;
 import com.chengq.app.mapper.MenuMapper;
 import com.chengq.app.mapper.RoleMapper;
 import com.chengq.app.mapper.RoleMenuMapper;
+import com.chengq.app.service.interfaces.IRoleMenuBatchService;
 import com.chengq.app.service.interfaces.IRoleMenuService;
-import com.chengq.app.mapper.RoleMenuMpService;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,17 +26,17 @@ public class RoleMenuServiceImpl implements IRoleMenuService {
     private final RoleMenuMapper roleMenuMapper;
     private final RoleMapper roleMapper;
     private final MenuMapper menuMapper;
-    private final RoleMenuMpService roleMenuMpService;
+    private final IRoleMenuBatchService roleMenuBatchService;
 
     public RoleMenuServiceImpl(
             RoleMenuMapper roleMenuMapper,
             RoleMapper roleMapper,
             MenuMapper menuMapper,
-            RoleMenuMpService roleMenuMpService) {
+            IRoleMenuBatchService roleMenuBatchService) {
         this.roleMenuMapper = roleMenuMapper;
         this.roleMapper = roleMapper;
         this.menuMapper = menuMapper;
-        this.roleMenuMpService = roleMenuMpService;
+        this.roleMenuBatchService = roleMenuBatchService;
     }
 
     private boolean isAdminRole(Long roleId) {
@@ -49,16 +51,16 @@ public class RoleMenuServiceImpl implements IRoleMenuService {
     @Transactional
     public void bindRoleMenus(Long roleId, List<Long> menuIds, Long parkId) {
         if (roleId == null) {
-            throw new RuntimeException("绑定角色菜单时 roleId 不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "绑定角色菜单时 roleId 不能为空");
         }
         if (parkId == null) {
-            throw new RuntimeException("绑定角色菜单时必须选择园区；各园区独立保存，互不影响其它园区");
+            throw new BizException(BizCodes.BAD_REQUEST, "绑定角色菜单时必须选择园区；各园区独立保存，互不影响其它园区");
         }
         if (menuIds == null || menuIds.isEmpty()) {
-            throw new RuntimeException("绑定角色菜单时 menuIds 不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "绑定角色菜单时 menuIds 不能为空");
         }
         if (isAdminRole(roleId)) {
-            throw new RuntimeException("ADMIN 角色拥有全部菜单，无需且不允许通过角色-菜单绑定修改");
+            throw new BizException(BizCodes.FORBIDDEN, "ADMIN 角色拥有全部菜单，无需且不允许通过角色-菜单绑定修改");
         }
         log.info("Binding menus to role: {}, parkId: {}", roleId, parkId);
         // 仅删除「该角色 + 该园区」下的旧绑定，其它园区的 tb_role_menu 行保留
@@ -75,7 +77,7 @@ public class RoleMenuServiceImpl implements IRoleMenuService {
                 rm.setParkId(parkId);
                 batch.add(rm);
             }
-            roleMenuMpService.saveBatch(batch);
+            roleMenuBatchService.saveBatch(batch);
         }
         log.info("Menus bound to role successfully: {}, parkId: {}", roleId, parkId);
     }
@@ -83,7 +85,7 @@ public class RoleMenuServiceImpl implements IRoleMenuService {
     @Override
     public List<Long> getMenuIdsByRoleId(Long roleId, Long parkId) {
         if (parkId == null) {
-            throw new RuntimeException("查询角色菜单绑定需指定园区");
+            throw new BizException(BizCodes.BAD_REQUEST, "查询角色菜单绑定需指定园区");
         }
         if (isAdminRole(roleId)) {
             List<Long> all = new ArrayList<>();

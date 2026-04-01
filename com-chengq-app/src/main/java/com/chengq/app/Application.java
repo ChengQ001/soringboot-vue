@@ -14,7 +14,7 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
         log.info("================ start app success =======================");
-        log.info("================ Swagger:http://localhost:8080/swagger ======================" );
-        log.info("================ API:http://localhost:8080/api-docs ======================");
+        log.info("================ Swagger: http://localhost:8081/swagger ======================");
+        log.info("================ API docs: http://localhost:8081/api-docs ======================");
     }
 }

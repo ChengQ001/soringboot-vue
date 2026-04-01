@@ -2,6 +2,8 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.User;
+import com.chengq.app.exception.BizCodes;
+import com.chengq.app.exception.BizException;
 import com.chengq.app.mapper.UserMapper;
 import com.chengq.api.model.SysUserAddRequest;
 import com.chengq.api.model.SysUserUpdateRequest;
@@ -37,15 +39,15 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public SysUserVO addUser(SysUserAddRequest request) {
         if (!StringUtils.hasText(request.getPhone())) {
-            throw new RuntimeException("手机号不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "手机号不能为空");
         }
         if (userMapper.selectByPhone(request.getPhone().trim()) != null) {
-            throw new RuntimeException("手机号已存在");
+            throw new BizException(BizCodes.CONFLICT, "手机号已存在");
         }
         if (StringUtils.hasText(request.getUsername())) {
             User exists = userMapper.selectByUsername(request.getUsername().trim());
             if (exists != null) {
-                throw new RuntimeException("用户名已存在");
+                throw new BizException(BizCodes.CONFLICT, "用户名已存在");
             }
         }
         User user = new User();
@@ -62,17 +64,17 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public SysUserVO updateUser(SysUserUpdateRequest request) {
         if (request.getId() == null) {
-            throw new RuntimeException("用户ID不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "用户ID不能为空");
         }
         User user = userMapper.selectById(request.getId());
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new BizException(BizCodes.NOT_FOUND, "用户不存在");
         }
         if (StringUtils.hasText(request.getPhone())) {
             String phone = request.getPhone().trim();
             User other = userMapper.selectByPhone(phone);
             if (other != null && !other.getId().equals(user.getId())) {
-                throw new RuntimeException("手机号已被其他用户使用");
+                throw new BizException(BizCodes.CONFLICT, "手机号已被其他用户使用");
             }
             user.setPhone(phone);
         }
@@ -81,7 +83,7 @@ public class SysUserServiceImpl implements ISysUserService {
             if (name != null) {
                 User other = userMapper.selectByUsername(name);
                 if (other != null && !other.getId().equals(user.getId())) {
-                    throw new RuntimeException("用户名已被占用");
+                    throw new BizException(BizCodes.CONFLICT, "用户名已被占用");
                 }
             }
             user.setUsername(name);
@@ -99,14 +101,14 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public void deleteUser(Long id) {
         if (id == null) {
-            throw new RuntimeException("用户ID不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "用户ID不能为空");
         }
         User user = userMapper.selectById(id);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new BizException(BizCodes.NOT_FOUND, "用户不存在");
         }
         if (isProtectedAdmin(user)) {
-            throw new RuntimeException("admin 账号为系统保留账号，禁止删除");
+            throw new BizException(BizCodes.FORBIDDEN, "admin 账号为系统保留账号，禁止删除");
         }
         userMapper.deleteById(id);
     }

@@ -50,6 +50,10 @@ tmp/
 .vscode/
 *.code-workspace
 
+# 前端依赖与构建产物
+frontend/node_modules/
+frontend/dist/
+
 # 系统文件
 .DS_Store
 Thumbs.db

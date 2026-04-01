@@ -2,6 +2,8 @@ package com.chengq.app.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chengq.api.entity.Park;
+import com.chengq.app.exception.BizCodes;
+import com.chengq.app.exception.BizException;
 import com.chengq.app.mapper.ParkMapper;
 import com.chengq.api.model.SysParkAddRequest;
 import com.chengq.api.model.SysParkUpdateRequest;
@@ -29,10 +31,10 @@ public class SysParkServiceImpl implements ISysParkService {
     public SysParkVO addPark(SysParkAddRequest request) {
         String name = trimToNull(request.getName());
         if (!StringUtils.hasText(name)) {
-            throw new RuntimeException("园区名称不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "园区名称不能为空");
         }
         if (parkMapper.selectByName(name) != null) {
-            throw new RuntimeException("园区名称已存在");
+            throw new BizException(BizCodes.CONFLICT, "园区名称已存在");
         }
         Park park = new Park();
         park.setName(name);
@@ -44,20 +46,20 @@ public class SysParkServiceImpl implements ISysParkService {
     @Override
     public SysParkVO updatePark(SysParkUpdateRequest request) {
         if (request.getId() == null) {
-            throw new RuntimeException("园区ID不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "园区ID不能为空");
         }
         Park park = parkMapper.selectById(request.getId());
         if (park == null) {
-            throw new RuntimeException("园区不存在");
+            throw new BizException(BizCodes.NOT_FOUND, "园区不存在");
         }
         if (request.getName() != null) {
             String name = trimToNull(request.getName());
             if (!StringUtils.hasText(name)) {
-                throw new RuntimeException("园区名称不能为空");
+                throw new BizException(BizCodes.BAD_REQUEST, "园区名称不能为空");
             }
             Park other = parkMapper.selectByName(name);
             if (other != null && !other.getId().equals(park.getId())) {
-                throw new RuntimeException("园区名称已存在");
+                throw new BizException(BizCodes.CONFLICT, "园区名称已存在");
             }
             park.setName(name);
         }
@@ -71,11 +73,11 @@ public class SysParkServiceImpl implements ISysParkService {
     @Override
     public void deletePark(Long id) {
         if (id == null) {
-            throw new RuntimeException("园区ID不能为空");
+            throw new BizException(BizCodes.BAD_REQUEST, "园区ID不能为空");
         }
         Park park = parkMapper.selectById(id);
         if (park == null) {
-            throw new RuntimeException("园区不存在");
+            throw new BizException(BizCodes.NOT_FOUND, "园区不存在");
         }
         parkMapper.deleteById(id);
     }

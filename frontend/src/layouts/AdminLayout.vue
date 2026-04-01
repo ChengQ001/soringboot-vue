@@ -111,7 +111,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { userApi } from '../api/user'
 import { authApi } from '../api/auth'
 import { menuApi } from '../api/menu'
 import { logout as doLogout } from '../utils/auth'
@@ -181,37 +180,32 @@ function closeChangePasswordModal() {
   confirmPassword.value = ''
 }
 
-function normalizeAuthority(a) {
-  if (!a) return ''
-  if (typeof a === 'string') return a
-  if (typeof a === 'object') return a.authority || a.name || ''
-  return String(a)
-}
-
 const rolesText = computed(() => {
-  const auth = userDetail.value?.authorities || []
-  if (!Array.isArray(auth) || auth.length === 0) return '无角色'
-  const roleNames = auth
-    .map((a) => normalizeAuthority(a))
-    .filter(Boolean)
-    .filter((s) => s.startsWith('ROLE_'))
-    .map((s) => s.replace(/^ROLE_/, ''))
-  return roleNames.length ? roleNames.join(', ') : '无角色'
+  const r = userDetail.value?.roles
+  if (!Array.isArray(r) || r.length === 0) return '无角色'
+  return r.join(', ')
 })
 
-async function fetchUserDetail() {
+/** 个人信息来自登录时写入的 localStorage（与 LoginResponse.roles 一致） */
+function loadUserProfileFromStorage() {
   userDetailLoading.value = true
   try {
-    // 后端：POST /users/current-user
-    // 返回值为 Spring Security 当前登录 principal（User 实体，包含 id/phone/username + roles/permissions）
-    const res = await userApi.getCurrentUser({})
-    if (res.code === 200) {
-      userDetail.value = res.data || null
-    } else {
-      flash(res.msg || '获取用户信息失败', 'error')
+    const idRaw = localStorage.getItem('userId')
+    let roles = []
+    try {
+      const raw = localStorage.getItem('roles')
+      const parsed = raw ? JSON.parse(raw) : []
+      roles = Array.isArray(parsed) ? parsed : []
+    } catch {
+      roles = []
     }
-  } catch (e) {
-    flash(e?.message || '获取用户信息失败', 'error')
+    const id = idRaw != null && idRaw !== '' ? Number(idRaw) : null
+    userDetail.value = {
+      id: Number.isFinite(id) ? id : null,
+      username: localStorage.getItem('username') || '',
+      phone: localStorage.getItem('phone') || '',
+      roles
+    }
   } finally {
     userDetailLoading.value = false
   }
@@ -256,18 +250,18 @@ async function fetchMenuTree() {
   }
 }
 
-async function openUserModal() {
+function openUserModal() {
   closeDropdown()
   userModalVisible.value = true
-  await fetchUserDetail()
+  loadUserProfileFromStorage()
 }
 
-async function openChangePasswordModal() {
+function openChangePasswordModal() {
   closeDropdown()
   changePasswordModalVisible.value = true
   newPassword.value = ''
   confirmPassword.value = ''
-  await fetchUserDetail()
+  loadUserProfileFromStorage()
 }
 
 async function handleLogout() {
