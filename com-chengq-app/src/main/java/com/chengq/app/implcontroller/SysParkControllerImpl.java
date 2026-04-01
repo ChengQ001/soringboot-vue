@@ -2,7 +2,7 @@ package com.chengq.app.implcontroller;
 
 import com.chengq.api.controller.SysParkController;
 import com.chengq.api.model.EmptyRequest;
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.base.IdRequest;
 import com.chengq.api.model.SysParkAddRequest;
 import com.chengq.api.model.SysParkUpdateRequest;
 import com.chengq.api.model.SysParkVO;

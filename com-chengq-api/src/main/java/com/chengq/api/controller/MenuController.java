@@ -2,7 +2,7 @@ package com.chengq.api.controller;
 
 import com.chengq.api.entity.Menu;
 import com.chengq.api.model.EmptyRequest;
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.base.IdRequest;
 import com.chengq.api.model.ParentIdRequest;
 import com.chengq.api.model.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;

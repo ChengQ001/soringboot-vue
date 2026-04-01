@@ -2,7 +2,7 @@ package com.chengq.app.implcontroller;
 
 import com.chengq.api.controller.SysUserController;
 import com.chengq.api.model.EmptyRequest;
-import com.chengq.api.model.IdRequest;
+import com.chengq.api.model.base.IdRequest;
 import com.chengq.api.model.SysUserAddRequest;
 import com.chengq.api.model.SysUserUpdateRequest;
 import com.chengq.api.model.SysUserVO;

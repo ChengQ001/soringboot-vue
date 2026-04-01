@@ -1,4 +1,4 @@
-package com.chengq.api.model;
+package com.chengq.api.model.base;
 
 import lombok.Data;
 
